@@ -1,16 +1,14 @@
 import java.util.Random;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.floor;
 
 public class GA {
 
-    //global variables
     static int tournamentSize =2;
     static int taskNumber = 3;
     static int populationSize = 30;
     static int chromosomeSize = 50;
-    static int generationLength = 10;
+    static int generationLength = 100;
     static int[] idealTaskAllocation = new int[] {10,10,10};
     static int[][] population = new int [taskNumber][chromosomeSize];
     static int[] currentFitnessFunction = new int[chromosomeSize];
@@ -19,24 +17,25 @@ public class GA {
     static int remainingPopulationSize;
     static int tempPopulationSize;
     static int tempFitnessFunction;
-    static int elitismValue = 10;
+    static int elitismValue;
     static int mutationRate;
+    static int errorOffspring1;
+    static int errorOffspring2;
+
     static int tempSel1;
     static int tempSel2;
     static int[][] offspring1 = new int[taskNumber][1];
     static int[][] offspring2 = new int[taskNumber][1];
 
     static Random random = new Random();
-    static int errorOffspring1;
-    static int errorOffspring2;
 
     //TODO: create function that dynamically creates ideal levelled Task Allocation?
     //TODO: create different fitness functions?
     //TODO: implement roulette wheel selection?
     //TODO: Comments
     //TODO: elitism
+    //TODO: selection
     //TODO: mutation
-    //TODO: modify selection function
 
     public static void main(String args[]){
 
@@ -44,11 +43,9 @@ public class GA {
         int [][] currentPopulationSize = initialise(population);
 
         //iterate for several iterations
-        for (int gen = 1; gen <= generationLength; gen++){
-            System.out.println("Generation " + gen);
+        for (int gen = 0; gen < generationLength; gen++){
             //evaluation of Fitness Function
             currentFitnessFunction = independentFitnessEvaluation(population);
-            //tournament selection of the population
             int [][] tempPopulation = tournamentSelection(currentPopulationSize,currentFitnessFunction);
 
             //crossover
@@ -154,7 +151,6 @@ public class GA {
                 tempFitnessFunction+=abs((idealTaskAllocation[j] - population[j][i]));
             }
             fitnessFunction[i] = tempFitnessFunction;
-            System.out.println(fitnessFunction[i]);
         }
         return fitnessFunction;
     }
@@ -181,7 +177,14 @@ public class GA {
                 }
             }
         }
+
+        for (int z = 0; z<chromosomeSize;z++){
+            System.out.println("\nChromosome number " + z + " fitness score: " + fitnessFunction[z]);
+            for (int x = 0; x < taskNumber; x++){
+                System.out.print(tempPopulation[x][z] + " ");
+            }
+
+        }
         return tempPopulation;
     }
-
 }
