@@ -1,14 +1,16 @@
 import java.util.Random;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.floor;
 
 public class GA {
 
+    //global variables
     static int tournamentSize =2;
     static int taskNumber = 3;
     static int populationSize = 30;
     static int chromosomeSize = 50;
-    static int generationLength = 100;
+    static int generationLength = 10;
     static int[] idealTaskAllocation = new int[] {10,10,10};
     static int[][] population = new int [taskNumber][chromosomeSize];
     static int[] currentFitnessFunction = new int[chromosomeSize];
@@ -17,18 +19,24 @@ public class GA {
     static int remainingPopulationSize;
     static int tempPopulationSize;
     static int tempFitnessFunction;
-    static int elitismValue;
+    static int elitismValue = 10;
     static int mutationRate;
+    static int tempSel1;
+    static int tempSel2;
+    static int[][] offspring1 = new int[taskNumber][1];
+    static int[][] offspring2 = new int[taskNumber][1];
 
     static Random random = new Random();
+    static int errorOffspring1;
+    static int errorOffspring2;
 
     //TODO: create function that dynamically creates ideal levelled Task Allocation?
     //TODO: create different fitness functions?
     //TODO: implement roulette wheel selection?
     //TODO: Comments
     //TODO: elitism
-    //TODO: selection
     //TODO: mutation
+    //TODO: modify selection function
 
     public static void main(String args[]){
 
@@ -36,10 +44,79 @@ public class GA {
         int [][] currentPopulationSize = initialise(population);
 
         //iterate for several iterations
-        for (int gen = 0; gen < generationLength; gen++){
+        for (int gen = 1; gen <= generationLength; gen++){
+            System.out.println("Generation " + gen);
             //evaluation of Fitness Function
             currentFitnessFunction = independentFitnessEvaluation(population);
+            //tournament selection of the population
             int [][] tempPopulation = tournamentSelection(currentPopulationSize,currentFitnessFunction);
+
+            //crossover
+            for (int i = elitismValue; i < tempPopulation[0].length; i++){
+                tempSel1 = random.nextInt(tempPopulation[0].length - elitismValue) + elitismValue;
+                tempSel2 = random.nextInt(tempPopulation[0].length - elitismValue) + elitismValue;
+
+                for(int j=0; j < tempPopulation.length; j++){
+                    if(j == tempPopulation.length - 1){
+                        offspring1[j][0] = tempPopulation[j][tempSel2];
+                        offspring2[j][0] = tempPopulation[j][tempSel1];
+                        errorOffspring1 = offspring1[j][0] - tempPopulation[j][tempSel1];
+                        errorOffspring2 = offspring2[j][0] - tempPopulation[j][tempSel2];
+                        //System.out.println("\nOffspring1 " + offspring1[0][0] + " " + offspring1[1][0] + " " + offspring1[2][0]);
+                        //System.out.println("\nOffspring2 " + offspring2[0][0] + " " + offspring2[1][0] + " " + offspring2[2][0]);
+                        if(errorOffspring1 < 0){
+                            int redistribute = (int) Math.floor((abs(errorOffspring1)/tempPopulation.length));
+                            int remainder = abs(errorOffspring1) % tempPopulation.length;
+                            for(int k = 0; k < tempPopulation.length; k++){
+                                offspring1[k][0] += redistribute;
+                            }
+                            if(remainder != 0){
+                                offspring1[tempPopulation.length-1][0] += remainder;
+                            }
+                        }
+                        if(errorOffspring1 > 0){
+                            int redistribute = (int) Math.floor((abs(errorOffspring1)/tempPopulation.length));
+                            int remainder = abs(errorOffspring1) % tempPopulation.length;
+                            for(int k = 0; k < tempPopulation.length; k++){
+                                offspring1[k][0] -= redistribute;
+                            }
+                            if(remainder != 0){
+                                offspring1[tempPopulation.length-1][0] -= remainder;
+                            }
+                        }
+                        if(errorOffspring2 < 0){
+                            int redistribute = (int) Math.floor((abs(errorOffspring2)/tempPopulation.length));
+                            int remainder = abs(errorOffspring2) % tempPopulation.length;
+                            for(int k = 0; k < tempPopulation.length; k++){
+                                offspring2[k][0] += redistribute;
+                            }
+                            if(remainder!=0){
+                                offspring2[tempPopulation.length-1][0] += remainder;
+                            }
+                        }
+                        if(errorOffspring2 > 0){
+                            int redistribute = (int) Math.floor((abs(errorOffspring2)/tempPopulation.length));
+                            int remainder = abs(errorOffspring2) % tempPopulation.length;
+                            for(int k = 0; k < tempPopulation.length; k++){
+                                offspring2[k][0] -= redistribute;
+                            }
+                            if(remainder!=0){
+                                offspring2[tempPopulation.length-1][0] -= remainder;
+                            }
+                        }
+                        //System.out.println("\nOffspring1 with constraint " + offspring1[0][0] + " " + offspring1[1][0] + " " + offspring1[2][0]);
+                        //System.out.println("\nOffspring2 with constraint " + offspring2[0][0] + " " + offspring2[1][0] + " " + offspring2[2][0]);
+                    }else {
+                        offspring1[j][0] = tempPopulation[j][tempSel1];
+                        offspring2[j][0] = tempPopulation[j][tempSel2];
+                    }
+
+                }
+
+            }
+
+            //mutation
+
         }
 
     }
@@ -77,6 +154,7 @@ public class GA {
                 tempFitnessFunction+=abs((idealTaskAllocation[j] - population[j][i]));
             }
             fitnessFunction[i] = tempFitnessFunction;
+            System.out.println(fitnessFunction[i]);
         }
         return fitnessFunction;
     }
@@ -103,14 +181,7 @@ public class GA {
                 }
             }
         }
-
-        for (int z = 0; z<chromosomeSize;z++){
-            System.out.println("\nChromosome number " + z + " fitness score: " + fitnessFunction[z]);
-            for (int x = 0; x < taskNumber; x++){
-                System.out.print(tempPopulation[x][z] + " ");
-            }
-
-        }
         return tempPopulation;
     }
+
 }
