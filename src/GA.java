@@ -19,7 +19,7 @@ public class GA {
     static int tempPopulationSize;
     static int tempFitnessFunction;
     static int elitismValue = 1;
-    static int mutationRate;
+    static int mutationRate = 1;
     static int errorOffspring1;
     static int errorOffspring2;
 
@@ -30,6 +30,7 @@ public class GA {
 
     static int mutateChromosome;
     static int mutateTask;
+    static List<Integer> mutatedGene;
 
     static Random random = new Random();
 
@@ -64,8 +65,8 @@ public class GA {
                         row2.add(tempPopulation.get(tempSel1).get(j));
                         errorOffspring1 = row1.get(j) - tempPopulation.get(tempSel1).get(j);
                         errorOffspring2 = row2.get(j) - tempPopulation.get(tempSel2).get(j);
-                        System.out.println("\nOffspring1 " + row1.get(0) + " " + row1.get(1) + " " + row1.get(2));
-                        System.out.println("\nOffspring2 " + row2.get(0) + " " + row2.get(1) + " " + row2.get(2));
+//                        System.out.println("\nOffspring1 " + row1.get(0) + " " + row1.get(1) + " " + row1.get(2));
+//                        System.out.println("\nOffspring2 " + row2.get(0) + " " + row2.get(1) + " " + row2.get(2));
                         if(errorOffspring1 < 0){
                             int redistribute = (int) Math.floor((abs(errorOffspring1)/taskNumber));
                             int remainder = abs(errorOffspring1) % taskNumber;
@@ -108,8 +109,8 @@ public class GA {
                         }
                         offspring1.add(row1);
                         offspring2.add(row2);
-                        System.out.println("\nOffspring1 with constraint " + row1.get(0) + " " + row1.get(1) + " " + row1.get(2));
-                        System.out.println("\nOffspring2 with constraint " + row2.get(0) + " " + row2.get(1) + " " + row2.get(2));
+//                        System.out.println("\nOffspring1 with constraint " + row1.get(0) + " " + row1.get(1) + " " + row1.get(2));
+//                        System.out.println("\nOffspring2 with constraint " + row2.get(0) + " " + row2.get(1) + " " + row2.get(2));
                     }else {
                         row1.add(tempPopulation.get(tempSel1).get(j));
                         row2.add(tempPopulation.get(tempSel2).get(j));
@@ -120,12 +121,31 @@ public class GA {
             }
 
             //mutation
-//            for(int z = 0; z < mutationRate; z++){
-//                mutateChromosome = random.nextInt(tempPopulation.size());
-//                mutateTask = random.nextInt(taskNumber);
-//
-//                tempPopulation.set(tempPopulation.get(mutateChromosome).get(mutateTask));
-//            }
+            for(int z = 0; z < mutationRate; z++){
+                mutateChromosome = random.nextInt(tempPopulation.size());
+                mutateTask = random.nextInt(taskNumber);
+                mutatedGene = new ArrayList<>();
+
+
+
+                System.out.println("Original gene");
+                for(int s = 0; s <taskNumber; s++){
+                    System.out.println(tempPopulation.get(mutateChromosome).get(s));
+                }
+                for(int x = 0; x < taskNumber; x ++){
+                    if(x==mutateTask){
+                        mutatedGene.add(tempPopulation.get(mutateChromosome).get(x) + 1);
+                    }
+                    else {
+                        mutatedGene.add(tempPopulation.get(mutateChromosome).get(x));
+                    }
+                }
+                System.out.println("Mutated gene");
+                for(int u = 0; u < taskNumber; u++){
+                    System.out.println(mutatedGene.get(u));
+                }
+
+            }
         }
 
     }
