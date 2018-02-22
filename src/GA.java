@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static java.lang.Math.abs;
@@ -10,8 +12,7 @@ public class GA {
     static int chromosomeSize = 50;
     static int generationLength = 100;
     static int[] idealTaskAllocation = new int[] {10,10,10};
-    static int[][] population = new int [taskNumber][chromosomeSize];
-    static int[] currentFitnessFunction = new int[chromosomeSize];
+    static List<Integer> currentFitnessFunction = new ArrayList<>();
 
 
     static int remainingPopulationSize;
@@ -40,77 +41,77 @@ public class GA {
     public static void main(String args[]){
 
         //initialise
-        int [][] currentPopulationSize = initialise(population);
+        List<List<Integer>> population = initialise();
 
         //iterate for several iterations
         for (int gen = 0; gen < generationLength; gen++){
             //evaluation of Fitness Function
             currentFitnessFunction = independentFitnessEvaluation(population);
-            int [][] tempPopulation = tournamentSelection(currentPopulationSize,currentFitnessFunction);
-
-            //crossover
-            for (int i = elitismValue; i < tempPopulation[0].length; i++){
-                tempSel1 = random.nextInt(tempPopulation[0].length - elitismValue) + elitismValue;
-                tempSel2 = random.nextInt(tempPopulation[0].length - elitismValue) + elitismValue;
-
-                for(int j=0; j < tempPopulation.length; j++){
-                    if(j == tempPopulation.length - 1){
-                        offspring1[j][0] = tempPopulation[j][tempSel2];
-                        offspring2[j][0] = tempPopulation[j][tempSel1];
-                        errorOffspring1 = offspring1[j][0] - tempPopulation[j][tempSel1];
-                        errorOffspring2 = offspring2[j][0] - tempPopulation[j][tempSel2];
-                        //System.out.println("\nOffspring1 " + offspring1[0][0] + " " + offspring1[1][0] + " " + offspring1[2][0]);
-                        //System.out.println("\nOffspring2 " + offspring2[0][0] + " " + offspring2[1][0] + " " + offspring2[2][0]);
-                        if(errorOffspring1 < 0){
-                            int redistribute = (int) Math.floor((abs(errorOffspring1)/tempPopulation.length));
-                            int remainder = abs(errorOffspring1) % tempPopulation.length;
-                            for(int k = 0; k < tempPopulation.length; k++){
-                                offspring1[k][0] += redistribute;
-                            }
-                            if(remainder != 0){
-                                offspring1[tempPopulation.length-1][0] += remainder;
-                            }
-                        }
-                        if(errorOffspring1 > 0){
-                            int redistribute = (int) Math.floor((abs(errorOffspring1)/tempPopulation.length));
-                            int remainder = abs(errorOffspring1) % tempPopulation.length;
-                            for(int k = 0; k < tempPopulation.length; k++){
-                                offspring1[k][0] -= redistribute;
-                            }
-                            if(remainder != 0){
-                                offspring1[tempPopulation.length-1][0] -= remainder;
-                            }
-                        }
-                        if(errorOffspring2 < 0){
-                            int redistribute = (int) Math.floor((abs(errorOffspring2)/tempPopulation.length));
-                            int remainder = abs(errorOffspring2) % tempPopulation.length;
-                            for(int k = 0; k < tempPopulation.length; k++){
-                                offspring2[k][0] += redistribute;
-                            }
-                            if(remainder!=0){
-                                offspring2[tempPopulation.length-1][0] += remainder;
-                            }
-                        }
-                        if(errorOffspring2 > 0){
-                            int redistribute = (int) Math.floor((abs(errorOffspring2)/tempPopulation.length));
-                            int remainder = abs(errorOffspring2) % tempPopulation.length;
-                            for(int k = 0; k < tempPopulation.length; k++){
-                                offspring2[k][0] -= redistribute;
-                            }
-                            if(remainder!=0){
-                                offspring2[tempPopulation.length-1][0] -= remainder;
-                            }
-                        }
-                        //System.out.println("\nOffspring1 with constraint " + offspring1[0][0] + " " + offspring1[1][0] + " " + offspring1[2][0]);
-                        //System.out.println("\nOffspring2 with constraint " + offspring2[0][0] + " " + offspring2[1][0] + " " + offspring2[2][0]);
-                    }else {
-                        offspring1[j][0] = tempPopulation[j][tempSel1];
-                        offspring2[j][0] = tempPopulation[j][tempSel2];
-                    }
-
-                }
-
-            }
+            List<List<Integer>> tempPopulation = tournamentSelection(population,currentFitnessFunction);
+//
+//            //crossover
+//            for (int i = elitismValue; i < tempPopulation[0].length; i++){
+//                tempSel1 = random.nextInt(tempPopulation[0].length - elitismValue) + elitismValue;
+//                tempSel2 = random.nextInt(tempPopulation[0].length - elitismValue) + elitismValue;
+//
+//                for(int j=0; j < tempPopulation.length; j++){
+//                    if(j == tempPopulation.length - 1){
+//                        offspring1[j][0] = tempPopulation[j][tempSel2];
+//                        offspring2[j][0] = tempPopulation[j][tempSel1];
+//                        errorOffspring1 = offspring1[j][0] - tempPopulation[j][tempSel1];
+//                        errorOffspring2 = offspring2[j][0] - tempPopulation[j][tempSel2];
+//                        //System.out.println("\nOffspring1 " + offspring1[0][0] + " " + offspring1[1][0] + " " + offspring1[2][0]);
+//                        //System.out.println("\nOffspring2 " + offspring2[0][0] + " " + offspring2[1][0] + " " + offspring2[2][0]);
+//                        if(errorOffspring1 < 0){
+//                            int redistribute = (int) Math.floor((abs(errorOffspring1)/tempPopulation.length));
+//                            int remainder = abs(errorOffspring1) % tempPopulation.length;
+//                            for(int k = 0; k < tempPopulation.length; k++){
+//                                offspring1[k][0] += redistribute;
+//                            }
+//                            if(remainder != 0){
+//                                offspring1[tempPopulation.length-1][0] += remainder;
+//                            }
+//                        }
+//                        if(errorOffspring1 > 0){
+//                            int redistribute = (int) Math.floor((abs(errorOffspring1)/tempPopulation.length));
+//                            int remainder = abs(errorOffspring1) % tempPopulation.length;
+//                            for(int k = 0; k < tempPopulation.length; k++){
+//                                offspring1[k][0] -= redistribute;
+//                            }
+//                            if(remainder != 0){
+//                                offspring1[tempPopulation.length-1][0] -= remainder;
+//                            }
+//                        }
+//                        if(errorOffspring2 < 0){
+//                            int redistribute = (int) Math.floor((abs(errorOffspring2)/tempPopulation.length));
+//                            int remainder = abs(errorOffspring2) % tempPopulation.length;
+//                            for(int k = 0; k < tempPopulation.length; k++){
+//                                offspring2[k][0] += redistribute;
+//                            }
+//                            if(remainder!=0){
+//                                offspring2[tempPopulation.length-1][0] += remainder;
+//                            }
+//                        }
+//                        if(errorOffspring2 > 0){
+//                            int redistribute = (int) Math.floor((abs(errorOffspring2)/tempPopulation.length));
+//                            int remainder = abs(errorOffspring2) % tempPopulation.length;
+//                            for(int k = 0; k < tempPopulation.length; k++){
+//                                offspring2[k][0] -= redistribute;
+//                            }
+//                            if(remainder!=0){
+//                                offspring2[tempPopulation.length-1][0] -= remainder;
+//                            }
+//                        }
+//                        //System.out.println("\nOffspring1 with constraint " + offspring1[0][0] + " " + offspring1[1][0] + " " + offspring1[2][0]);
+//                        //System.out.println("\nOffspring2 with constraint " + offspring2[0][0] + " " + offspring2[1][0] + " " + offspring2[2][0]);
+//                    }else {
+//                        offspring1[j][0] = tempPopulation[j][tempSel1];
+//                        offspring2[j][0] = tempPopulation[j][tempSel2];
+//                    }
+//
+//                }
+//
+//            }
 
             //mutation
 
@@ -118,73 +119,71 @@ public class GA {
 
     }
 
-    public static int[][] initialise(int[][] pop){
-        int [][] population = pop;
+    public static List<List<Integer>> initialise(){
+        List<List<Integer>> population = new ArrayList<>();
+
         for(int i=0; i<chromosomeSize; i++){
             remainingPopulationSize = populationSize;
+            List<Integer> row = new ArrayList<>();
             for(int j=0; j< taskNumber; j++){
                 if(j!=taskNumber-1){
                     do {
                         tempPopulationSize = random.nextInt(populationSize + 1) + 0;
                     } while (tempPopulationSize > remainingPopulationSize);
-                    population[j][i] =tempPopulationSize;
+                    row.add(tempPopulationSize);
                     remainingPopulationSize-=tempPopulationSize;
                 }else {
                     //assign the remainder of the population
-                    population[j][i] = remainingPopulationSize;
+                    row.add(remainingPopulationSize);
                 }
             }
+            population.add(row);
         }
 
         return population;
     }
 
-    public static int[] independentFitnessEvaluation(int[][] population){
+    public static List<Integer> independentFitnessEvaluation(List<List<Integer>> population){
 
-        int popSize = population[0].length;
-        int taskSize = population.length;
-
-        int[] fitnessFunction = new int[popSize];
-        for(int i = 0; i <popSize; i++){
+        List<Integer> fitnessFunction = new ArrayList<>();
+        System.out.println(population.size());
+        for(int i = 0; i <population.size(); i++){
             tempFitnessFunction = 0;
-            for(int j = 0; j < taskSize; j++){
-                tempFitnessFunction+=abs((idealTaskAllocation[j] - population[j][i]));
+            for(int j = 0; j < taskNumber; j++){
+                tempFitnessFunction+=abs((idealTaskAllocation[j] - population.get(i).get(j)));
             }
-            fitnessFunction[i] = tempFitnessFunction;
+            fitnessFunction.add(tempFitnessFunction);
         }
         return fitnessFunction;
     }
 
-    public static int[][] tournamentSelection(int[][] pop, int [] fitnessFunction){
+    public static List<List<Integer>> tournamentSelection(List<List<Integer>> pop, List<Integer> fitnessFunction){
 
-        int taskSize = pop.length;
-        int popSize = pop[0].length;
-        int [][] tempPopulation = new int[taskSize][popSize];
+        List<List<Integer>> tempPopulation = new ArrayList<>();
+
         int tempValue1;
         int tempValue2;
 
-        for(int i = 0; i < popSize; i++){
-            tempValue1 = random.nextInt(popSize) + 0;
-            tempValue2 = random.nextInt(popSize) + 0;
+        for(int i = 0; i < pop.size(); i++){
+            List<Integer> row = new ArrayList<>();
+            tempValue1 = random.nextInt(pop.size()) + 0;
+            tempValue2 = random.nextInt(pop.size()) + 0;
 
-            if(fitnessFunction[tempValue1] > fitnessFunction[tempValue2]){
-                for(int j = 0; j <taskSize; j++){
-                    tempPopulation[j][i] = pop[j][tempValue2];
-                }
-            }else{
-                for (int j = 0; j < taskSize; j++){
-                    tempPopulation[j][i] = pop[j][tempValue1];
+            System.out.println(fitnessFunction.get(tempValue1));
+            System.out.println(fitnessFunction.get(tempValue2));
+            if(fitnessFunction.get(tempValue1) > fitnessFunction.get(tempValue2)){
+                for(int j = 0; j <taskNumber; j++){
+                   row.add(pop.get(tempValue2).get(j));
                 }
             }
-        }
-
-        for (int z = 0; z<chromosomeSize;z++){
-            System.out.println("\nChromosome number " + z + " fitness score: " + fitnessFunction[z]);
-            for (int x = 0; x < taskNumber; x++){
-                System.out.print(tempPopulation[x][z] + " ");
+            if(fitnessFunction.get(tempValue1) < fitnessFunction.get(tempValue2)) {
+                for (int j = 0; j < taskNumber; j++){
+                    row.add(pop.get(tempValue1).get(j));
+                }
             }
-
+            tempPopulation.add(row);
         }
+
         return tempPopulation;
     }
 }
