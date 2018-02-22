@@ -8,25 +8,23 @@ public class GA {
 
     static int tournamentSize =2;
     static int taskNumber = 3;
-    static int populationSize = 30;
-    static int chromosomeSize = 50;
+    static int populationSize = 300;
+    static int chromosomeSize = 1000;
     static int generationLength = 100;
-    static int[] idealTaskAllocation = new int[] {10,10,10};
+    static int[] idealTaskAllocation = new int[] {100,100,100};
     static List<Integer> currentFitnessFunction = new ArrayList<>();
 
 
     static int remainingPopulationSize;
     static int tempPopulationSize;
     static int tempFitnessFunction;
-    static int elitismValue = 1;
+    static int elitismValue = 10;
     static int mutationRate = 1;
     static int errorOffspring1;
     static int errorOffspring2;
 
     static int tempSel1;
     static int tempSel2;
-    static List<List<Integer>> offspring1 = new ArrayList<>();
-    static List<List<Integer>> offspring2 = new ArrayList<>();
 
     static int mutateChromosome;
     static int mutateTask;
@@ -39,8 +37,7 @@ public class GA {
     //TODO: implement roulette wheel selection?
     //TODO: Comments
     //TODO: elitism
-    //TODO: correct selection
-    //TODO: mutation
+    //TODO: correct maths
 
     public static void main(String args[]){
 
@@ -49,71 +46,74 @@ public class GA {
 
         //iterate for several iterations
         for (int gen = 0; gen < generationLength; gen++){
+            System.out.println("Generation " + gen);
             //evaluation of Fitness Function
             currentFitnessFunction = independentFitnessEvaluation(population);
             List<List<Integer>> tempPopulation = tournamentSelection(population,currentFitnessFunction);
+
+            population.clear();
 
             //crossover
             for (int i = elitismValue; i < tempPopulation.size(); i++){
                 tempSel1 = random.nextInt(tempPopulation.size());
                 tempSel2 = random.nextInt(tempPopulation.size());
-                List<Integer> row1 = new ArrayList<>();
-                List<Integer> row2 = new ArrayList<>();
+                List<Integer> offspring1 = new ArrayList<>();
+                List<Integer> offspring2 = new ArrayList<>();
                 for(int j=0; j < taskNumber; j++){
                     if(j == taskNumber - 1){
-                        row1.add(tempPopulation.get(tempSel2).get(j));
-                        row2.add(tempPopulation.get(tempSel1).get(j));
-                        errorOffspring1 = row1.get(j) - tempPopulation.get(tempSel1).get(j);
-                        errorOffspring2 = row2.get(j) - tempPopulation.get(tempSel2).get(j);
-//                        System.out.println("\nOffspring1 " + row1.get(0) + " " + row1.get(1) + " " + row1.get(2));
-//                        System.out.println("\nOffspring2 " + row2.get(0) + " " + row2.get(1) + " " + row2.get(2));
+                        offspring1.add(tempPopulation.get(tempSel2).get(j));
+                        offspring2.add(tempPopulation.get(tempSel1).get(j));
+                        errorOffspring1 = offspring1.get(j) - tempPopulation.get(tempSel1).get(j);
+                        errorOffspring2 = offspring2.get(j) - tempPopulation.get(tempSel2).get(j);
+//                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+//                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
                         if(errorOffspring1 < 0){
                             int redistribute = (int) Math.floor((abs(errorOffspring1)/taskNumber));
                             int remainder = abs(errorOffspring1) % taskNumber;
                             for(int k = 0; k < taskNumber; k++){
-                                row1.set(k,row1.get(k) + redistribute);
+                                offspring1.set(k,offspring1.get(k) + redistribute);
                             }
                             if(remainder != 0){
-                                row1.set(taskNumber-1,row1.get(taskNumber-1) + remainder);
+                                offspring1.set(taskNumber-1,offspring1.get(taskNumber-1) + remainder);
                             }
                         }
                         if(errorOffspring1 > 0){
                             int redistribute = (int) Math.floor((abs(errorOffspring1)/taskNumber));
                             int remainder = abs(errorOffspring1) % taskNumber;
                             for(int k = 0; k < taskNumber; k++){
-                                row1.set(k,row1.get(k) - redistribute);
+                                offspring1.set(k,offspring1.get(k) - redistribute);
                             }
                             if(remainder != 0){
-                                row1.set(taskNumber-1, row1.get(taskNumber-1) - remainder);
+                                offspring1.set(taskNumber-1, offspring1.get(taskNumber-1) - remainder);
                             }
                         }
                         if(errorOffspring2 < 0){
                             int redistribute = (int) Math.floor((abs(errorOffspring2)/taskNumber));
                             int remainder = abs(errorOffspring2) % taskNumber;
                             for(int k = 0; k < taskNumber; k++){
-                                row2.set(k, row2.get(k) + redistribute);
+                                offspring2.set(k, offspring2.get(k) + redistribute);
                             }
                             if(remainder!=0){
-                                row2.set(taskNumber-1, row2.get(taskNumber - 1) + remainder);
+                                offspring2.set(taskNumber-1, offspring2.get(taskNumber - 1) + remainder);
                             }
                         }
                         if(errorOffspring2 > 0){
                             int redistribute = (int) Math.floor((abs(errorOffspring2)/taskNumber));
                             int remainder = abs(errorOffspring2) % taskNumber;
                             for(int k = 0; k < taskNumber; k++){
-                                row2.set(k, row2.get(k) - redistribute);
+                                offspring2.set(k, offspring2.get(k) - redistribute);
                             }
                             if(remainder!=0){
-                                row2.set(taskNumber -1, row2.get(taskNumber - 1) - remainder);
+                                offspring2.set(taskNumber -1, offspring2.get(taskNumber - 1) - remainder);
                             }
                         }
-                        offspring1.add(row1);
-                        offspring2.add(row2);
-//                        System.out.println("\nOffspring1 with constraint " + row1.get(0) + " " + row1.get(1) + " " + row1.get(2));
-//                        System.out.println("\nOffspring2 with constraint " + row2.get(0) + " " + row2.get(1) + " " + row2.get(2));
+                        population.add(offspring1);
+                        population.add(offspring2);
+//                        System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+//                        System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
                     }else {
-                        row1.add(tempPopulation.get(tempSel1).get(j));
-                        row2.add(tempPopulation.get(tempSel2).get(j));
+                        offspring1.add(tempPopulation.get(tempSel1).get(j));
+                        offspring2.add(tempPopulation.get(tempSel2).get(j));
                     }
 
                 }
@@ -146,6 +146,8 @@ public class GA {
                 }
 
             }
+
+            population.add(mutatedGene);
         }
 
     }
