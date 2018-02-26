@@ -8,18 +8,18 @@ public class GA {
 
     static int tournamentSize =2;
     static int taskNumber = 3;
-    static int populationSize = 300;
+    static int populationSize = 30;
     static int chromosomeSize = 1000;
     static int generationLength = 100;
     static int numberOfRuns = 100;
-    static int[] idealTaskAllocation = new int[] {100,100,100};
+    static int[] idealTaskAllocation = new int[] {10,10,10};
     static List<Integer> currentFitnessFunction = new ArrayList<>();
 
 
     static int remainingPopulationSize;
     static int tempPopulationSize;
     static int tempFitnessFunction;
-    static int elitismValue = 10;
+    static int elitismValue = 1;
     static int mutationRate = 1;
     static int errorOffspring1;
     static int errorOffspring2;
@@ -131,18 +131,16 @@ public class GA {
                     mutateTask = random.nextInt(taskNumber);
                     mutatedGene = new ArrayList<>();
 
-
-
                     System.out.println("Original gene");
                     for(int s = 0; s <taskNumber; s++){
                         System.out.println(tempPopulation.get(mutateChromosome).get(s));
                     }
                     for(int x = 0; x < taskNumber; x ++){
                         if(x==mutateTask){
-                            mutatedGene.add(tempPopulation.get(mutateChromosome).get(x) + 1);
+                            mutatedGene.add(tempPopulation.get(mutateChromosome).get(x) + 2);
                         }
                         else {
-                            mutatedGene.add(tempPopulation.get(mutateChromosome).get(x));
+                            mutatedGene.add(tempPopulation.get(mutateChromosome).get(x) - 1);
                         }
                     }
                     System.out.println("Mutated gene");
