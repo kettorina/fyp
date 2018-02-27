@@ -7,7 +7,7 @@ public abstract class GA implements Comparator<List<List<Integer>>>{
     static int remainingPopulationSize;
     static int currentPopulationSize;
     static int tempFitnessFunction;
-    static int elitismValue = 1;
+    static int elitismValue = 2;
     static int mutationRate = 1;
     static int errorOffspring1;
     static int errorOffspring2;
@@ -39,8 +39,6 @@ public abstract class GA implements Comparator<List<List<Integer>>>{
     //TODO: evolving environment
     //TODO: plot graphs
     //TODO: Comments
-    //TODO: add elite to the population
-    //TODO: correct doubling of the population
 
     public static void main(String args[]){
 
@@ -73,14 +71,31 @@ public abstract class GA implements Comparator<List<List<Integer>>>{
                     tempFitness[count][1] = count;
                 }
 
-                Arrays.sort(tempFitness, new Comparator<int[]>() {
-                    @Override
-                    public int compare(int[] o1, int[] o2) {
-                        final Integer value1 = o1[0];
-                        final Integer value2 = o2[0];
-                        return value2.compareTo(value1);
-                    }
-                });
+                if(isDeceptive){
+                    Arrays.sort(tempFitness, new Comparator<int[]>() {
+                        @Override
+                        public int compare(int[] o1, int[] o2) {
+                            final Integer value1 = o1[0];
+                            final Integer value2 = o2[0];
+                            return value2.compareTo(value1);
+                        }
+                    });
+                }
+                else if (!isDeceptive){
+                    Arrays.sort(tempFitness, new Comparator<int[]>() {
+                        @Override
+                        public int compare(int[] o1, int[] o2) {
+                            final Integer value1 = o1[0];
+                            final Integer value2 = o2[0];
+                            return value2.compareTo(value1);
+                        }
+                    }.reversed());
+                }
+
+//                for(int s = 0; s < tempFitness.length; s ++){
+//                    System.out.println(tempFitness[s][0]);
+//                    System.out.println(tempFitness[s][1]);
+//                }
 
                 //add top elite solutions
                 for(int elite = 0; elite < elitismValue; elite++){
