@@ -2,24 +2,24 @@ import java.util.*;
 
 import static java.lang.Math.abs;
 
-public abstract class GA implements Comparator<List<List<Integer>>>{
+public class GA implements Comparator<List<List<Integer>>>{
 
     static int remainingPopulationSize;
     static int currentPopulationSize;
     static int tempFitnessFunction;
-    static int elitismValue = 2;
-    static int mutationRate = 1;
+    static int elitismValue;
+    static int mutationRate;
     static int errorOffspring1;
     static int errorOffspring2;
-    static int maxFitnessFunction = 15;
+    static int maxFitnessFunction;
 
     static int tournamentSize =2;
-    static int taskNumber = 3;
-    static int populationSize = 30;
-    static int chromosomeSize = 100;
+    static int taskNumber;
+    static int populationSize;
+    static int chromosomeSize;
     static int generationLength = 10;
     static int numberOfRuns = 100;
-    static int[] idealTaskAllocation = new int[] {10,10,10};
+    static int[] idealTaskAllocation;
     static List<Integer> currentFitnessFunction;
     static int[][] eliteChromosomes = new int[elitismValue][2];
 
@@ -33,24 +33,40 @@ public abstract class GA implements Comparator<List<List<Integer>>>{
 
     static Random random = new Random();
 
-    static boolean isDeceptive = false;
-    static boolean isChangingLandscape = false;
+    static boolean isDeceptive;
+    static boolean isChangingLandscape;
 
     //TODO: evolving environment
     //TODO: plot graphs
     //TODO: Comments
 
-    public static void main(String args[]){
+    public GA(int popSize, int tasks, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing){
+        this.populationSize = popSize;
+        this.taskNumber = tasks;
+        this.idealTaskAllocation = taskAllocation;
+        this.chromosomeSize = solutions;
+        this.elitismValue = elite;
+        this.mutationRate = mutation;
+        this.maxFitnessFunction = maxFitness;
+        this.isDeceptive = deceptive;
+        this.isChangingLandscape = changing;
 
+        start();
+
+    }
+
+    public static void start(){
         for(int run = 0; run < numberOfRuns; run++){
+
+            System.out.println("Run: " + run);
 
             //initialise
             List<List<Integer>> population = initialise();
-            System.out.println("Population size at initialisation" + population.size());
 
             //iterate for several iterations
             for (int gen = 0; gen < generationLength; gen++){
-                System.out.println("Generation " + gen);
+
+                //System.out.println("Generation " + gen);
 
                 currentFitnessFunction = new ArrayList<>();
 
@@ -122,8 +138,8 @@ public abstract class GA implements Comparator<List<List<Integer>>>{
                             offspring2.add(currentPopulation.get(tempSel1).get(j));
                             errorOffspring1 = offspring1.get(j) - currentPopulation.get(tempSel1).get(j);
                             errorOffspring2 = offspring2.get(j) - currentPopulation.get(tempSel2).get(j);
-    //                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-    //                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+                            //                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+                            //                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
                             if(errorOffspring1 < 0){
                                 int redistribute = (int) Math.floor((abs(errorOffspring1)/taskNumber));
                                 int remainder = abs(errorOffspring1) % taskNumber;
@@ -166,8 +182,8 @@ public abstract class GA implements Comparator<List<List<Integer>>>{
                             }
                             population.add(offspring1);
                             population.add(offspring2);
-    //                        System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-    //                        System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+                            //                        System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+                            //                        System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
                         }else {
                             offspring1.add(currentPopulation.get(tempSel1).get(j));
                             offspring2.add(currentPopulation.get(tempSel2).get(j));
@@ -317,4 +333,36 @@ public abstract class GA implements Comparator<List<List<Integer>>>{
         return currentPopulation;
     }
 
+    public static int[] changingLandscape(int[] idealTaskAllocation){
+
+        //total of ants to be task re-allocated
+
+        isChangingLandscape = true;
+        int remainingPopulation = populationSize;
+        int rand;
+        int[] newTaskAllocation = new int[idealTaskAllocation.length];
+
+        do {
+            for(int i = 0; i < idealTaskAllocation.length; i++){
+                do{
+                    rand = random.nextInt(remainingPopulation +1);
+                } while (rand > remainingPopulation);
+
+                if(i==idealTaskAllocation.length - 1){
+                    newTaskAllocation[i] = remainingPopulation;
+                }else{
+                    newTaskAllocation[i] = rand;
+                    remainingPopulation -= rand;
+                }
+            }
+        }while (newTaskAllocation.equals(idealTaskAllocation));
+
+        return  newTaskAllocation;
+
+    }
+
+    @Override
+    public int compare(List<List<Integer>> o1, List<List<Integer>> o2) {
+        return 0;
+    }
 }
