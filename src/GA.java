@@ -21,7 +21,6 @@ public class GA implements Comparator<List<List<Integer>>>{
     static int numberOfRuns = 100;
     static int[] idealTaskAllocation;
     static List<Integer> currentFitnessFunction;
-    static int[][] eliteChromosomes = new int[elitismValue][2];
 
     static int tempSel1;
     static int tempSel2;
@@ -35,6 +34,8 @@ public class GA implements Comparator<List<List<Integer>>>{
 
     static boolean isDeceptive;
     static boolean isChangingLandscape;
+
+    static int[] originalTaskAlloc;
 
     //TODO: evolving environment
     //TODO: plot graphs
@@ -66,12 +67,19 @@ public class GA implements Comparator<List<List<Integer>>>{
             //iterate for several iterations
             for (int gen = 0; gen < generationLength; gen++){
 
+                if(gen==Math.floor(generationLength/2) && isChangingLandscape){
+                    changingLandscape(idealTaskAllocation);
+                }
+
                 //System.out.println("Generation " + gen);
 
                 currentFitnessFunction = new ArrayList<>();
 
                 //evaluation of Fitness Function
-                currentFitnessFunction = unimodalFitnessEvaluation(population);
+                if(isDeceptive){
+                    currentFitnessFunction = deceptiveFitnessEvaluation(population);
+                }
+                else currentFitnessFunction = unimodalFitnessEvaluation(population);
                 List<List<Integer>> currentPopulation = tournamentSelection(population,currentFitnessFunction);
 
                 population.clear();
@@ -333,11 +341,11 @@ public class GA implements Comparator<List<List<Integer>>>{
         return currentPopulation;
     }
 
-    public static int[] changingLandscape(int[] idealTaskAllocation){
+    public static void changingLandscape(int[] idealTaskAllocation){
 
         //total of ants to be task re-allocated
-
-        isChangingLandscape = true;
+        originalTaskAlloc = new int[idealTaskAllocation.length];
+        originalTaskAlloc = idealTaskAllocation;
         int remainingPopulation = populationSize;
         int rand;
         int[] newTaskAllocation = new int[idealTaskAllocation.length];
@@ -357,7 +365,7 @@ public class GA implements Comparator<List<List<Integer>>>{
             }
         }while (newTaskAllocation.equals(idealTaskAllocation));
 
-        return  newTaskAllocation;
+        idealTaskAllocation = newTaskAllocation;
 
     }
 
