@@ -31,49 +31,54 @@ public class mainGA {
     public static void main (String args[]){
         int[] idealTask = new int[] {100,100,100};
 
-        GA run1 = new GA(300,3, idealTask,5000, 20, 10, 100, false, false);
-        bestUnimodalFitness = run1.getBestFitness();
-        averageUnimodalFitness = run1.getAverageFitness();
+        for(int run = 1; run <= 100; run++){
 
-        XYLineChart_AWT chart = new XYLineChart_AWT("Fitness Unimodal Function",
-                "Fitness Unimodal Function", bestUnimodalFitness, averageUnimodalFitness);
-        chart.pack( );
-        RefineryUtilities.centerFrameOnScreen( chart );
-        chart.setVisible( true );
+            GA run1 = new GA(300,3, idealTask,5000, 20, 10, 100, false, false);
+            bestUnimodalFitness = run1.getBestFitness();
+            averageUnimodalFitness = run1.getAverageFitness();
 
-
-        GA run2 = new GA(300,3, idealTask, 5000, 20, 10, 100, false, true);
-        bestChangingUnimodalFitness = run2.getBestFitness();
-        averageChangingUnimodalFitness = run2.getAverageFitness();
-
-        XYLineChart_AWT chart2 = new XYLineChart_AWT("Fitness Changing Unimodal Function",
-                "Fitness Changing Unimodal Function", bestChangingUnimodalFitness, averageChangingUnimodalFitness);
-        chart2.pack( );
-        RefineryUtilities.centerFrameOnScreen( chart2 );
-        chart2.setVisible( true );
+            XYLineChart_AWT chart = new XYLineChart_AWT("Fitness Unimodal Function",
+                    "Fitness Unimodal Function Run " + run, bestUnimodalFitness, averageUnimodalFitness);
+            chart.pack( );
+            RefineryUtilities.centerFrameOnScreen( chart );
+            chart.setVisible( true );
 
 
+            GA run2 = new GA(300,3, idealTask, 5000, 20, 10, 100, false, true);
+            bestChangingUnimodalFitness = run2.getBestFitness();
+            averageChangingUnimodalFitness = run2.getAverageFitness();
 
-        GA run3 = new GA(300,3,idealTask,5000,20,10,100,true,false);
-        bestDeceptiveFitness = run3.getBestFitness();
-        averageDeceptiveFitness = run3.getAverageFitness();
-
-        XYLineChart_AWT chart3 = new XYLineChart_AWT("Fitness Deceptive Function",
-                "Fitness Deceptive Function", bestDeceptiveFitness, averageDeceptiveFitness);
-        chart3.pack( );
-        RefineryUtilities.centerFrameOnScreen( chart3 );
-        chart3.setVisible( true );
+            XYLineChart_AWT chart2 = new XYLineChart_AWT("Fitness Changing Unimodal Function",
+                    "Fitness Changing Unimodal FunctionRun " + run, bestChangingUnimodalFitness, averageChangingUnimodalFitness);
+            chart2.pack( );
+            RefineryUtilities.centerFrameOnScreen( chart2 );
+            chart2.setVisible( true );
 
 
-        GA run4 = new GA(300,3,idealTask,5000,20,10,100,true,true);
-        bestChangingDeceptiveFitness = run4.getBestFitness();
-        averageChangingDeceptiveFitness = run4.getAverageFitness();
 
-        XYLineChart_AWT chart4 = new XYLineChart_AWT("Fitness Changing Deceptive Function",
-                "Fitness Changing Deceptive Function", bestChangingDeceptiveFitness, averageChangingDeceptiveFitness);
-        chart4.pack( );
-        RefineryUtilities.centerFrameOnScreen( chart4 );
-        chart4.setVisible( true );
+            GA run3 = new GA(300,3,idealTask,5000,20,10,100,true,false);
+            bestDeceptiveFitness = run3.getBestFitness();
+            averageDeceptiveFitness = run3.getAverageFitness();
+
+            XYLineChart_AWT chart3 = new XYLineChart_AWT("Fitness Deceptive Function",
+                    "Fitness Deceptive FunctionRun " + run, bestDeceptiveFitness, averageDeceptiveFitness);
+            chart3.pack( );
+            RefineryUtilities.centerFrameOnScreen( chart3 );
+            chart3.setVisible( true );
+
+
+            GA run4 = new GA(300,3,idealTask,5000,20,10,100,true,true);
+            bestChangingDeceptiveFitness = run4.getBestFitness();
+            averageChangingDeceptiveFitness = run4.getAverageFitness();
+
+            XYLineChart_AWT chart4 = new XYLineChart_AWT("Fitness Changing Deceptive Function",
+                    "Fitness Changing Deceptive FunctionRun " + run, bestChangingDeceptiveFitness, averageChangingDeceptiveFitness);
+            chart4.pack( );
+            RefineryUtilities.centerFrameOnScreen( chart4 );
+            chart4.setVisible( true );
+        }
+
+
 
     }
 }
@@ -124,13 +129,13 @@ class XYLineChart_AWT extends ApplicationFrame {
 
     private XYDataset createDataset( ) {
         final XYSeries best = new XYSeries( "Best" );
-        for(int gen = 0; gen < 10; gen++){
+        for(int gen = 0; gen < 100; gen++){
             best.add(gen, bestDataset[0][gen]);
         }
 
 
         final XYSeries average = new XYSeries( "Average" );
-        for(int gen = 0; gen < 10; gen++){
+        for(int gen = 0; gen < 100; gen++){
             average.add(gen, averageDataset[0][gen]);
         }
 

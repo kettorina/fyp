@@ -17,7 +17,7 @@ public class GA implements Comparator<List<List<Integer>>>{
     static int taskNumber;
     static int populationSize;
     static int chromosomeSize;
-    static int generationLength = 10;
+    static int generationLength = 100;
     static int numberOfRuns = 100;
     static int[] idealTaskAllocation;
     static List<Integer> currentFitnessFunction;
@@ -57,187 +57,179 @@ public class GA implements Comparator<List<List<Integer>>>{
     }
 
     public static void start(){
-       // for(int run = 0; run < numberOfRuns; run++){
 
-            //System.out.println("Run: " + run);
+        //initialise
+        List<List<Integer>> population = initialise();
 
-            //initialise
-            List<List<Integer>> population = initialise();
+        bestFitness = new int[1][generationLength];
+        averageFitness = new int[1][generationLength];
 
-            bestFitness = new int[1][generationLength];
-            averageFitness = new int[1][generationLength];
+        //iterate for several iterations
+        for (int gen = 0; gen < generationLength; gen++) {
 
-            //iterate for several iterations
-            for (int gen = 0; gen < generationLength; gen++){
+            if (gen == Math.floor(generationLength / 2) && isChangingLandscape) {
+                changingLandscape(idealTaskAllocation);
+            }
 
-                if(gen==Math.floor(generationLength/2) && isChangingLandscape){
-                    changingLandscape(idealTaskAllocation);
-                }
+            //System.out.println("Generation " + gen);
 
-                //System.out.println("Generation " + gen);
+            currentFitnessFunction = new ArrayList<>();
 
-                currentFitnessFunction = new ArrayList<>();
+            //evaluation of Fitness Function
+            if (isDeceptive) {
+                currentFitnessFunction = deceptiveFitnessEvaluation(population);
+            } else currentFitnessFunction = unimodalFitnessEvaluation(population);
+            List<List<Integer>> currentPopulation = tournamentSelection(population, currentFitnessFunction);
 
-                //evaluation of Fitness Function
-                if(isDeceptive){
-                    currentFitnessFunction = deceptiveFitnessEvaluation(population);
-                }
-                else currentFitnessFunction = unimodalFitnessEvaluation(population);
-                List<List<Integer>> currentPopulation = tournamentSelection(population,currentFitnessFunction);
+            population.clear();
 
-                population.clear();
+            int[][] tempFitness = new int[currentFitnessFunction.size()][2];
 
-                int[][] tempFitness = new int[currentFitnessFunction.size()][2];
+            //elitism
+            count = -1;
 
-                //elitism
-                count = -1;
+            for (Integer current : currentFitnessFunction) {
+                count++;
+                tempFitness[count][0] = current;
+                tempFitness[count][1] = count;
+            }
 
-                for (Integer current: currentFitnessFunction) {
-                    count++;
-                    tempFitness[count][0] = current;
-                    tempFitness[count][1] = count;
-                }
-
-                if(isDeceptive){
-                    Arrays.sort(tempFitness, new Comparator<int[]>() {
-                        @Override
-                        public int compare(int[] o1, int[] o2) {
-                            final Integer value1 = o1[0];
-                            final Integer value2 = o2[0];
-                            return value2.compareTo(value1);
-                        }
-                    });
-                }
-                else if (!isDeceptive){
-                    Arrays.sort(tempFitness, new Comparator<int[]>() {
-                        @Override
-                        public int compare(int[] o1, int[] o2) {
-                            final Integer value1 = o1[0];
-                            final Integer value2 = o2[0];
-                            return value2.compareTo(value1);
-                        }
-                    }.reversed());
-                }
+            if (isDeceptive) {
+                Arrays.sort(tempFitness, new Comparator<int[]>() {
+                    @Override
+                    public int compare(int[] o1, int[] o2) {
+                        final Integer value1 = o1[0];
+                        final Integer value2 = o2[0];
+                        return value2.compareTo(value1);
+                    }
+                });
+            } else if (!isDeceptive) {
+                Arrays.sort(tempFitness, new Comparator<int[]>() {
+                    @Override
+                    public int compare(int[] o1, int[] o2) {
+                        final Integer value1 = o1[0];
+                        final Integer value2 = o2[0];
+                        return value2.compareTo(value1);
+                    }
+                }.reversed());
+            }
 
 //                for(int s = 0; s < tempFitness.length; s ++){
 //                    System.out.println(tempFitness[s][0]);
 //                    System.out.println(tempFitness[s][1]);
 //                }
 
-                //add top elite solutions
-                for(int elite = 0; elite < elitismValue; elite++){
-                    List<Integer> row = new ArrayList<>();
-                    for(int task = 0; task < taskNumber; task ++){
-                        row.add(currentPopulation.get(tempFitness[elite][1]).get(task));
-                    }
-                    population.add(row);
+            //add top elite solutions
+            for (int elite = 0; elite < elitismValue; elite++) {
+                List<Integer> row = new ArrayList<>();
+                for (int task = 0; task < taskNumber; task++) {
+                    row.add(currentPopulation.get(tempFitness[elite][1]).get(task));
                 }
+                population.add(row);
+            }
 
 
-                bestFitness[0][gen] = tempFitness[0][0];
-                averageFitness[0][gen] = tempFitness[(int)Math.floor(tempFitness.length/2)][0];
+            bestFitness[0][gen] = tempFitness[0][0];
+            averageFitness[0][gen] = tempFitness[(int) Math.floor(tempFitness.length / 2)][0];
 
 
+            //System.out.println("Fitness Size: " + currentFitnessFunction.size());
 
-                //System.out.println("Fitness Size: " + currentFitnessFunction.size());
-
-                //crossover
-                for (int i = elitismValue; i < Math.floor(currentPopulation.size()/2); i++){
-                    tempSel1 = random.nextInt(currentPopulation.size());
-                    tempSel2 = random.nextInt(currentPopulation.size());
-                    List<Integer> offspring1 = new ArrayList<>();
-                    List<Integer> offspring2 = new ArrayList<>();
-                    for(int j=0; j < taskNumber; j++){
-                        if(j == taskNumber - 1){
-                            offspring1.add(currentPopulation.get(tempSel2).get(j));
-                            offspring2.add(currentPopulation.get(tempSel1).get(j));
-                            errorOffspring1 = offspring1.get(j) - currentPopulation.get(tempSel1).get(j);
-                            errorOffspring2 = offspring2.get(j) - currentPopulation.get(tempSel2).get(j);
-                            //                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-                            //                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
-                            if(errorOffspring1 < 0){
-                                int redistribute = (int) Math.floor((abs(errorOffspring1)/taskNumber));
-                                int remainder = abs(errorOffspring1) % taskNumber;
-                                for(int k = 0; k < taskNumber; k++){
-                                    offspring1.set(k,offspring1.get(k) + redistribute);
-                                }
-                                if(remainder != 0){
-                                    offspring1.set(taskNumber-1,offspring1.get(taskNumber-1) + remainder);
-                                }
+            //crossover
+            for (int i = elitismValue; i < Math.floor(currentPopulation.size() / 2); i++) {
+                tempSel1 = random.nextInt(currentPopulation.size());
+                tempSel2 = random.nextInt(currentPopulation.size());
+                List<Integer> offspring1 = new ArrayList<>();
+                List<Integer> offspring2 = new ArrayList<>();
+                for (int j = 0; j < taskNumber; j++) {
+                    if (j == taskNumber - 1) {
+                        offspring1.add(currentPopulation.get(tempSel2).get(j));
+                        offspring2.add(currentPopulation.get(tempSel1).get(j));
+                        errorOffspring1 = offspring1.get(j) - currentPopulation.get(tempSel1).get(j);
+                        errorOffspring2 = offspring2.get(j) - currentPopulation.get(tempSel2).get(j);
+                        //                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+                        //                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+                        if (errorOffspring1 < 0) {
+                            int redistribute = (int) Math.floor((abs(errorOffspring1) / taskNumber));
+                            int remainder = abs(errorOffspring1) % taskNumber;
+                            for (int k = 0; k < taskNumber; k++) {
+                                offspring1.set(k, offspring1.get(k) + redistribute);
                             }
-                            if(errorOffspring1 > 0){
-                                int redistribute = (int) Math.floor((abs(errorOffspring1)/taskNumber));
-                                int remainder = abs(errorOffspring1) % taskNumber;
-                                for(int k = 0; k < taskNumber; k++){
-                                    offspring1.set(k,offspring1.get(k) - redistribute);
-                                }
-                                if(remainder != 0){
-                                    offspring1.set(taskNumber-1, offspring1.get(taskNumber-1) - remainder);
-                                }
+                            if (remainder != 0) {
+                                offspring1.set(taskNumber - 1, offspring1.get(taskNumber - 1) + remainder);
                             }
-                            if(errorOffspring2 < 0){
-                                int redistribute = (int) Math.floor((abs(errorOffspring2)/taskNumber));
-                                int remainder = abs(errorOffspring2) % taskNumber;
-                                for(int k = 0; k < taskNumber; k++){
-                                    offspring2.set(k, offspring2.get(k) + redistribute);
-                                }
-                                if(remainder!=0){
-                                    offspring2.set(taskNumber-1, offspring2.get(taskNumber - 1) + remainder);
-                                }
-                            }
-                            if(errorOffspring2 > 0){
-                                int redistribute = (int) Math.floor((abs(errorOffspring2)/taskNumber));
-                                int remainder = abs(errorOffspring2) % taskNumber;
-                                for(int k = 0; k < taskNumber; k++){
-                                    offspring2.set(k, offspring2.get(k) - redistribute);
-                                }
-                                if(remainder!=0){
-                                    offspring2.set(taskNumber -1, offspring2.get(taskNumber - 1) - remainder);
-                                }
-                            }
-                            population.add(offspring1);
-                            population.add(offspring2);
-                            //                        System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-                            //                        System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
-                        }else {
-                            offspring1.add(currentPopulation.get(tempSel1).get(j));
-                            offspring2.add(currentPopulation.get(tempSel2).get(j));
                         }
-
+                        if (errorOffspring1 > 0) {
+                            int redistribute = (int) Math.floor((abs(errorOffspring1) / taskNumber));
+                            int remainder = abs(errorOffspring1) % taskNumber;
+                            for (int k = 0; k < taskNumber; k++) {
+                                offspring1.set(k, offspring1.get(k) - redistribute);
+                            }
+                            if (remainder != 0) {
+                                offspring1.set(taskNumber - 1, offspring1.get(taskNumber - 1) - remainder);
+                            }
+                        }
+                        if (errorOffspring2 < 0) {
+                            int redistribute = (int) Math.floor((abs(errorOffspring2) / taskNumber));
+                            int remainder = abs(errorOffspring2) % taskNumber;
+                            for (int k = 0; k < taskNumber; k++) {
+                                offspring2.set(k, offspring2.get(k) + redistribute);
+                            }
+                            if (remainder != 0) {
+                                offspring2.set(taskNumber - 1, offspring2.get(taskNumber - 1) + remainder);
+                            }
+                        }
+                        if (errorOffspring2 > 0) {
+                            int redistribute = (int) Math.floor((abs(errorOffspring2) / taskNumber));
+                            int remainder = abs(errorOffspring2) % taskNumber;
+                            for (int k = 0; k < taskNumber; k++) {
+                                offspring2.set(k, offspring2.get(k) - redistribute);
+                            }
+                            if (remainder != 0) {
+                                offspring2.set(taskNumber - 1, offspring2.get(taskNumber - 1) - remainder);
+                            }
+                        }
+                        population.add(offspring1);
+                        population.add(offspring2);
+                        //                        System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+                        //                        System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+                    } else {
+                        offspring1.add(currentPopulation.get(tempSel1).get(j));
+                        offspring2.add(currentPopulation.get(tempSel2).get(j));
                     }
 
                 }
 
-                //mutation
-                for(int z = 0; z < mutationRate; z++){
-                    mutateChromosome = random.nextInt(currentPopulation.size());
-                    mutateTask = random.nextInt(taskNumber);
-                    mutatedGene = new ArrayList<>();
+            }
+
+            //mutation
+            for (int z = 0; z < mutationRate; z++) {
+                mutateChromosome = random.nextInt(currentPopulation.size());
+                mutateTask = random.nextInt(taskNumber);
+                mutatedGene = new ArrayList<>();
 
 //                   // System.out.println("Original gene");
 //                    for(int s = 0; s <taskNumber; s++){
 //                        System.out.println(currentPopulation.get(mutateChromosome).get(s));
 //                    }
-                    for(int x = 0; x < taskNumber; x ++){
-                        if(x==mutateTask){
-                            mutatedGene.add(currentPopulation.get(mutateChromosome).get(x) + 2);
-                        }
-                        else {
-                            mutatedGene.add(currentPopulation.get(mutateChromosome).get(x) - 1);
-                        }
+                for (int x = 0; x < taskNumber; x++) {
+                    if (x == mutateTask) {
+                        mutatedGene.add(currentPopulation.get(mutateChromosome).get(x) + 2);
+                    } else {
+                        mutatedGene.add(currentPopulation.get(mutateChromosome).get(x) - 1);
                     }
+                }
 //                    //System.out.println("Mutated gene");
 //                    for(int u = 0; u < taskNumber; u++){
 //                        System.out.println(mutatedGene.get(u));
 //                    }
 
-                }
-
-                population.add(mutatedGene);
-                currentPopulation.clear();
-                currentFitnessFunction.clear();
             }
-       // }
+
+            population.add(mutatedGene);
+            currentPopulation.clear();
+            currentFitnessFunction.clear();
+        }
 
     }
 
