@@ -370,6 +370,12 @@ public class GA implements Comparator<List<List<Integer>>>{
             }
         }while (newTaskAllocation.equals(idealTaskAllocation));
 
+        for(int j = 0; j <idealTaskAllocation.length; j++){
+            temp[j] = newTaskAllocation[j];
+            newTaskAllocation[j] = idealTaskAllocation[j];
+            idealTaskAllocation[j] = temp[j];
+        }
+
         idealTaskAllocation = newTaskAllocation;
 
     }
