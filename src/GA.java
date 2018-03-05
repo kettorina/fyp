@@ -71,9 +71,7 @@ public class GA implements Comparator<List<List<Integer>>>{
             for (int gen = 0; gen < generationLength; gen++){
 
                 if(gen==Math.floor(generationLength/2) && isChangingLandscape){
-                    System.out.println(idealTaskAllocation);
                     changingLandscape(idealTaskAllocation);
-                    System.out.println(idealTaskAllocation);
                 }
 
                 //System.out.println("Generation " + gen);

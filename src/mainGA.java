@@ -1,5 +1,6 @@
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -11,6 +12,8 @@ import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 public class mainGA {
     static int [][] bestDeceptiveFitness;
@@ -72,9 +75,6 @@ public class mainGA {
         RefineryUtilities.centerFrameOnScreen( chart4 );
         chart4.setVisible( true );
 
-
-
-
     }
 }
 
@@ -108,6 +108,18 @@ class XYLineChart_AWT extends ApplicationFrame {
         //renderer.setSeriesStroke( 2 , new BasicStroke( 2.0f ) );
         plot.setRenderer( renderer );
         setContentPane( chartPanel );
+
+        int width = 640;   /* Width of the image */
+        int height = 480;  /* Height of the image */
+        File XYChart = new File( chartTitle + ".jpeg" );
+
+        try{
+            ChartUtilities.saveChartAsJPEG( XYChart, xylineChart, width, height);
+        }catch (IOException ioException){
+            System.err.println("IO Exception");
+            ioException.printStackTrace();
+        }
+
     }
 
     private XYDataset createDataset( ) {
@@ -122,15 +134,10 @@ class XYLineChart_AWT extends ApplicationFrame {
             average.add(gen, averageDataset[0][gen]);
         }
 
-//        final XYSeries iexplorer = new XYSeries( "InternetExplorer" );
-//        iexplorer.add( 3.0 , 4.0 );
-//        iexplorer.add( 4.0 , 5.0 );
-//        iexplorer.add( 5.0 , 4.0 );
-
         final XYSeriesCollection dataset = new XYSeriesCollection( );
         dataset.addSeries(best);
         dataset.addSeries(average);
-        //dataset.addSeries( iexplorer );
+
         return dataset;
     }
 
