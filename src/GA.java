@@ -43,6 +43,8 @@ public class GA implements Comparator<List<List<Integer>>>{
     static boolean isConverging = false;
     static int convergenceValue;
 
+    static int totalFitnessValue = 0;
+    static double averageFitnessValue = 0;
     //TODO: plot graphs
 
     public GA(int popSize, int tasks, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing){
@@ -65,11 +67,16 @@ public class GA implements Comparator<List<List<Integer>>>{
         //initialise
         List<List<Integer>> population = initialise();
 
+
+
         bestFitness = new int[1][generationLength];
         averageFitness = new int[1][generationLength];
 
         //iterate for several iterations
         for (int gen = 0; gen < generationLength; gen++) {
+
+            totalFitnessValue = 0;
+            averageFitnessValue = 0;
 
             if (gen == Math.floor(generationLength / 2) && isChangingLandscape) {
                 changingLandscape(idealTaskAllocation);
@@ -98,6 +105,8 @@ public class GA implements Comparator<List<List<Integer>>>{
                 count++;
                 tempFitness[count][0] = current;
                 tempFitness[count][1] = count;
+
+                totalFitnessValue+= current;
             }
 
             if (isDeceptive) {
@@ -134,30 +143,24 @@ public class GA implements Comparator<List<List<Integer>>>{
                 population.add(row);
             }
 
+            bestFitness[0][gen] = tempFitness[0][0];
+            averageFitnessValue = totalFitnessValue/currentFitnessFunction.size();
+            averageFitness[0][gen] = (int) averageFitnessValue;
+
             if(!isConverging){
                 if(!isDeceptive){
-                    if(tempFitness[0][0] == 0){
+                    if(Math.abs(averageFitnessValue-0.0) <= 0.000001){
                         isConverging = true;
                         convergenceValue = gen;
                     }
                 }
-                else{
-                    if(tempFitness[0][0] >= 450){
+                else{//this part needs correction
+                    if(tempFitness[0][0] >= (maxFitnessFunction*taskNumber)){
                         isConverging = true;
                         convergenceValue = gen;
                     }
                 }
             }
-
-
-            if(idealTaskAllocation.equals(tempFitness[0][0]) && !isConverging){
-                isConverging = true;
-                convergenceValue = gen;
-
-            }
-
-            bestFitness[0][gen] = tempFitness[0][0];
-            averageFitness[0][gen] = tempFitness[(int) Math.floor(tempFitness.length / 2)][0];
 
 
             //System.out.println("Fitness Size: " + currentFitnessFunction.size());
