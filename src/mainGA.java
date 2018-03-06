@@ -14,6 +14,8 @@ import org.jfree.ui.RefineryUtilities;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class mainGA {
     static int [][] bestDeceptiveFitness;
@@ -28,57 +30,77 @@ public class mainGA {
     static int [][] bestChangingUnimodalFitness;
     static int [][] averageChangingUnimodalFitness;
 
+    static List<Integer> convergenceValuesUnimodal = new ArrayList<Integer>();
+    static List<Integer> convergenceValuesDeceptive = new ArrayList<>();
+    static int totalConvergenceUnimodal = 0;
+    static int totalConvergenceDeceptive = 0;
+
+
     public static void main (String args[]){
         int[] idealTask = new int[] {100,100,100};
 
         for(int run = 1; run <= 100; run++){
 
-            GA run1 = new GA(300,3, idealTask,5000, 20, 10, 100, false, false);
+            GA run1 = new GA(300,3, idealTask,5000, 20, 10, 150, false, false);
             bestUnimodalFitness = run1.getBestFitness();
             averageUnimodalFitness = run1.getAverageFitness();
+            if(run1.getIsConverging()){
+                totalConvergenceUnimodal += run1.getConvergenceValue();
+                convergenceValuesUnimodal.add(run1.getConvergenceValue());
+            }
 
-            XYLineChart_AWT chart = new XYLineChart_AWT("Fitness Unimodal Function",
-                    "Fitness Unimodal Function Run " + run, bestUnimodalFitness, averageUnimodalFitness);
-            chart.pack( );
-            RefineryUtilities.centerFrameOnScreen( chart );
-            chart.setVisible( true );
+//            XYLineChart_AWT chart = new XYLineChart_AWT("Fitness Unimodal Function",
+//                    "Fitness Unimodal Function Run " + run, bestUnimodalFitness, averageUnimodalFitness);
+//            chart.pack( );
+//            RefineryUtilities.centerFrameOnScreen( chart );
+//            chart.setVisible( true );
 
 
-            GA run2 = new GA(300,3, idealTask, 5000, 20, 10, 100, false, true);
+            GA run2 = new GA(300,3, idealTask, 5000, 20, 10, 150, false, true);
             bestChangingUnimodalFitness = run2.getBestFitness();
             averageChangingUnimodalFitness = run2.getAverageFitness();
 
-            XYLineChart_AWT chart2 = new XYLineChart_AWT("Fitness Changing Unimodal Function",
-                    "Fitness Changing Unimodal FunctionRun " + run, bestChangingUnimodalFitness, averageChangingUnimodalFitness);
-            chart2.pack( );
-            RefineryUtilities.centerFrameOnScreen( chart2 );
-            chart2.setVisible( true );
+//            XYLineChart_AWT chart2 = new XYLineChart_AWT("Fitness Changing Unimodal Function",
+//                    "Fitness Changing Unimodal FunctionRun " + run, bestChangingUnimodalFitness, averageChangingUnimodalFitness);
+//            chart2.pack( );
+//            RefineryUtilities.centerFrameOnScreen( chart2 );
+//            chart2.setVisible( true );
 
 
 
-            GA run3 = new GA(300,3,idealTask,5000,20,10,100,true,false);
+            GA run3 = new GA(300,3,idealTask,5000,20,10,150,true,false);
             bestDeceptiveFitness = run3.getBestFitness();
             averageDeceptiveFitness = run3.getAverageFitness();
 
-            XYLineChart_AWT chart3 = new XYLineChart_AWT("Fitness Deceptive Function",
-                    "Fitness Deceptive FunctionRun " + run, bestDeceptiveFitness, averageDeceptiveFitness);
-            chart3.pack( );
-            RefineryUtilities.centerFrameOnScreen( chart3 );
-            chart3.setVisible( true );
+//            XYLineChart_AWT chart3 = new XYLineChart_AWT("Fitness Deceptive Function",
+//                    "Fitness Deceptive FunctionRun " + run, bestDeceptiveFitness, averageDeceptiveFitness);
+//            chart3.pack( );
+//            RefineryUtilities.centerFrameOnScreen( chart3 );
+//            chart3.setVisible( true );
+
+            if(run3.getIsConverging()){
+                convergenceValuesDeceptive.add(run3.getConvergenceValue());
+                totalConvergenceDeceptive += run3.getConvergenceValue();
+            }
 
 
-            GA run4 = new GA(300,3,idealTask,5000,20,10,100,true,true);
+            GA run4 = new GA(300,3,idealTask,5000,20,10,150,true,true);
             bestChangingDeceptiveFitness = run4.getBestFitness();
             averageChangingDeceptiveFitness = run4.getAverageFitness();
 
-            XYLineChart_AWT chart4 = new XYLineChart_AWT("Fitness Changing Deceptive Function",
-                    "Fitness Changing Deceptive FunctionRun " + run, bestChangingDeceptiveFitness, averageChangingDeceptiveFitness);
-            chart4.pack( );
-            RefineryUtilities.centerFrameOnScreen( chart4 );
-            chart4.setVisible( true );
+//            XYLineChart_AWT chart4 = new XYLineChart_AWT("Fitness Changing Deceptive Function",
+//                    "Fitness Changing Deceptive FunctionRun " + run, bestChangingDeceptiveFitness, averageChangingDeceptiveFitness);
+//            chart4.pack( );
+//            RefineryUtilities.centerFrameOnScreen( chart4 );
+//            chart4.setVisible( true );
         }
 
+        double averageUnimodalConvergence = totalConvergenceUnimodal/convergenceValuesUnimodal.size();
+        double averageDeceptiveConvergence = totalConvergenceDeceptive/convergenceValuesDeceptive.size();
 
+        System.out.println("\t\t\t Runs \t\t Average gen");
+        System.out.println("Unimodal " + convergenceValuesUnimodal.size() + "\t\t\t\t" + averageUnimodalConvergence);
+        System.out.println("Deceptive " + convergenceValuesDeceptive.size() + "\t\t\t" + averageDeceptiveConvergence);
 
     }
 }

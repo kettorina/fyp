@@ -39,6 +39,10 @@ public class GA implements Comparator<List<List<Integer>>>{
     static int[][] bestFitness;
     static int[][] averageFitness;
 
+    //will hold the average value it took to converge
+    static boolean isConverging = false;
+    static int convergenceValue;
+
     //TODO: plot graphs
 
     public GA(int popSize, int tasks, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing){
@@ -79,6 +83,8 @@ public class GA implements Comparator<List<List<Integer>>>{
             if (isDeceptive) {
                 currentFitnessFunction = deceptiveFitnessEvaluation(population);
             } else currentFitnessFunction = unimodalFitnessEvaluation(population);
+
+
             List<List<Integer>> currentPopulation = tournamentSelection(population, currentFitnessFunction);
 
             population.clear();
@@ -128,6 +134,27 @@ public class GA implements Comparator<List<List<Integer>>>{
                 population.add(row);
             }
 
+            if(!isConverging){
+                if(!isDeceptive){
+                    if(tempFitness[0][0] == 0){
+                        isConverging = true;
+                        convergenceValue = gen;
+                    }
+                }
+                else{
+                    if(tempFitness[0][0] >= 450){
+                        isConverging = true;
+                        convergenceValue = gen;
+                    }
+                }
+            }
+
+
+            if(idealTaskAllocation.equals(tempFitness[0][0]) && !isConverging){
+                isConverging = true;
+                convergenceValue = gen;
+
+            }
 
             bestFitness[0][gen] = tempFitness[0][0];
             averageFitness[0][gen] = tempFitness[(int) Math.floor(tempFitness.length / 2)][0];
@@ -381,5 +408,13 @@ public class GA implements Comparator<List<List<Integer>>>{
 
     public int[][] getAverageFitness(){
         return averageFitness;
+    }
+
+    public boolean getIsConverging(){
+        return isConverging;
+    }
+
+    public int getConvergenceValue(){
+        return convergenceValue;
     }
 }
