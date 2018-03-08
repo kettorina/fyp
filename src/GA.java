@@ -17,7 +17,7 @@ public class GA implements Comparator<List<List<Integer>>>{
     static int taskNumber;
     static int populationSize;
     static int chromosomeSize;
-    static int generationLength = 100;
+    static int generationLength = 10;
     static int numberOfRuns = 100;
     static int[] idealTaskAllocation;
     static List<Integer> currentFitnessFunction;
@@ -166,7 +166,7 @@ public class GA implements Comparator<List<List<Integer>>>{
             //System.out.println("Fitness Size: " + currentFitnessFunction.size());
 
             //crossover
-            for (int i = elitismValue; i < Math.floor(currentPopulation.size() / 2); i++) {
+            for (int i = elitismValue; i < (Math.floor(currentPopulation.size() + elitismValue - mutationRate)/ 2); i++) {
                 tempSel1 = random.nextInt(currentPopulation.size());
                 tempSel2 = random.nextInt(currentPopulation.size());
                 List<Integer> offspring1 = new ArrayList<>();
@@ -253,10 +253,10 @@ public class GA implements Comparator<List<List<Integer>>>{
 //                    for(int u = 0; u < taskNumber; u++){
 //                        System.out.println(mutatedGene.get(u));
 //                    }
-
+                population.add(mutatedGene);
             }
 
-            population.add(mutatedGene);
+
             currentPopulation.clear();
             currentFitnessFunction.clear();
         }
@@ -293,8 +293,10 @@ public class GA implements Comparator<List<List<Integer>>>{
         for(int i = 0; i <population.size(); i++){
             tempFitnessFunction = 0;
             for(int j = 0; j < taskNumber; j++){
+                System.out.println(abs((idealTaskAllocation[j] - population.get(i).get(j))));
                 tempFitnessFunction+=abs((idealTaskAllocation[j] - population.get(i).get(j)));
             }
+            System.out.println("Fitness function: " + tempFitnessFunction);
             fitnessFunction.add(tempFitnessFunction);
         }
         return fitnessFunction;
@@ -337,12 +339,12 @@ public class GA implements Comparator<List<List<Integer>>>{
                     for(int j = 0; j <taskNumber; j++){
                         row.add(pop.get(tempValue2).get(j));
                     }
-                }
-                if(fitnessFunction.get(tempValue1) < fitnessFunction.get(tempValue2)) {
-                    for (int j = 0; j < taskNumber; j++){
+                }else{
+                    for(int j = 0; j <taskNumber; j++){
                         row.add(pop.get(tempValue1).get(j));
                     }
                 }
+
             }
             //else if the fitness function awards maximum values
             else {
@@ -351,7 +353,7 @@ public class GA implements Comparator<List<List<Integer>>>{
                         row.add(pop.get(tempValue2).get(j));
                     }
                 }
-                if(fitnessFunction.get(tempValue1) > fitnessFunction.get(tempValue2)) {
+                else {
                     for (int j = 0; j < taskNumber; j++){
                         row.add(pop.get(tempValue1).get(j));
                     }
@@ -419,5 +421,9 @@ public class GA implements Comparator<List<List<Integer>>>{
 
     public int getConvergenceValue(){
         return convergenceValue;
+    }
+
+    public int getGenerationLength(){
+        return  generationLength;
     }
 }
