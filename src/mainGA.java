@@ -19,10 +19,10 @@ import java.util.List;
 
 public class mainGA {
     static int [][] bestDeceptiveFitness;
-    static int [][] averageDeceptiveFitness;
+    static double [][] averageDeceptiveFitness;
 
     static int [][] bestUnimodalFitness;
-    static int [][] averageUnimodalFitness;
+    static double [][] averageUnimodalFitness;
 
     static int [][] bestChangingDeceptiveFitness;
     static int [][] averageChangingDeceptiveFitness;
@@ -35,22 +35,27 @@ public class mainGA {
     static int totalConvergenceUnimodal = 0;
     static int totalConvergenceDeceptive = 0;
 
+    static int generationLength;
+    static int run;
 
     public static void main (String args[]){
         int[] idealTask = new int[] {100,100,100};
 
-//        for(int run = 1; run <= 5; run++) {
+        for(run = 1; run <= 10; run++) {
 
-            GA run1 = new GA(300, 3, idealTask, 1000, 100, 10, 0, false, false);
-            bestUnimodalFitness = run1.getBestFitness();
-            averageUnimodalFitness = run1.getAverageFitness();
-            if (run1.getIsConverging()) {
-                totalConvergenceUnimodal += run1.getConvergenceValue();
-                convergenceValuesUnimodal.add(run1.getConvergenceValue());
-            }
-
+//            GA run1 = new GA(300, 3, idealTask, 1000, 100, 10, 0, false, false);
+//            bestUnimodalFitness = run1.getBestFitness();
+//            averageUnimodalFitness = run1.getAverageFitness();
+//            generationLength = run1.getGenerationLength();
+//            if (run1.getIsConverging()) {
+//                System.out.println(run1.getConvergenceValue());
+//                totalConvergenceUnimodal += run1.getConvergenceValue();
+//                convergenceValuesUnimodal.add(run1.getConvergenceValue());
+//                run1.setIsConverging(false);
+//            }
+//
 //            XYLineChart_AWT chart = new XYLineChart_AWT("Fitness Unimodal Function",
-//                    "Fitness Unimodal Function Run " + run, bestUnimodalFitness, averageUnimodalFitness);
+//                    "Fitness Unimodal Function Run " + run, bestUnimodalFitness, averageUnimodalFitness, generationLength);
 //            chart.pack( );
 //            RefineryUtilities.centerFrameOnScreen( chart );
 //            chart.setVisible( true );
@@ -67,21 +72,24 @@ public class mainGA {
 //            chart2.setVisible( true );
 //
 //
-//            GA run3 = new GA(300, 3, idealTask, 1000, 20, 10, 150, true, false);
-//            bestDeceptiveFitness = run3.getBestFitness();
-//            averageDeceptiveFitness = run3.getAverageFitness();
-//
-//            XYLineChart_AWT chart3 = new XYLineChart_AWT("Fitness Deceptive Function",
-//                    "Fitness Deceptive Function Run " + run, bestDeceptiveFitness, averageDeceptiveFitness);
-//            chart3.pack( );
-//            RefineryUtilities.centerFrameOnScreen( chart3 );
-//            chart3.setVisible( true );
-//
-//            if(run3.getIsConverging()){
-//                convergenceValuesDeceptive.add(run3.getConvergenceValue());
-//                totalConvergenceDeceptive += run3.getConvergenceValue();
-//            }
-//
+            GA run3 = new GA(300, 3, idealTask, 1000, 20, 10, 150, true, false);
+            bestDeceptiveFitness = run3.getBestFitness();
+            averageDeceptiveFitness = run3.getAverageFitness();
+            generationLength = run3.getGenerationLength();
+
+            XYLineChart_AWT chart3 = new XYLineChart_AWT("Fitness Deceptive Function",
+                    "Fitness Deceptive Function Run " + run, bestDeceptiveFitness, averageDeceptiveFitness, generationLength);
+            chart3.pack( );
+            RefineryUtilities.centerFrameOnScreen( chart3 );
+            chart3.setVisible( true );
+
+            if(run3.getIsConverging()){
+                System.out.println(run3.getConvergenceValue());
+                convergenceValuesDeceptive.add(run3.getConvergenceValue());
+                totalConvergenceDeceptive += run3.getConvergenceValue();
+                run3.setIsConverging(false);
+            }
+
 //
 //            GA run4 = new GA(300, 3, idealTask, 1000, 20, 10, 150, true, true);
 //            bestChangingDeceptiveFitness = run4.getBestFitness();
@@ -92,14 +100,14 @@ public class mainGA {
 //            chart4.pack( );
 //            RefineryUtilities.centerFrameOnScreen( chart4 );
 //            chart4.setVisible( true );
-//        }
-//
+        }
+
 //        double averageUnimodalConvergence = totalConvergenceUnimodal/convergenceValuesUnimodal.size();
-//        double averageDeceptiveConvergence = totalConvergenceDeceptive/convergenceValuesDeceptive.size();
-//
-//        System.out.println("\t\t\t Runs \t\t Average gen");
-//        System.out.println("Unimodal\t\t" + convergenceValuesUnimodal.size() + "\t\t\t\t" + averageUnimodalConvergence);
-//        System.out.println("Deceptive \t\t" + convergenceValuesDeceptive.size() + "\t\t\t\t" + averageDeceptiveConvergence);
+        double averageDeceptiveConvergence = totalConvergenceDeceptive/convergenceValuesDeceptive.size();
+
+        System.out.println("\t\t\t Total \t Runs \t Average gen");
+//        System.out.println("Unimodal\t\t10" + "\t\t" + convergenceValuesUnimodal.size() + "\t\t\t" + averageUnimodalConvergence);
+        System.out.println("Deceptive \t\t" + convergenceValuesDeceptive.size() + "\t\t\t\t" + averageDeceptiveConvergence);
 
     }
 }
@@ -107,12 +115,14 @@ public class mainGA {
 class XYLineChart_AWT extends ApplicationFrame {
 
     int[][] bestDataset;
-    int[][] averageDataset;
+    double[][] averageDataset;
+    int generationLength;
 
-    public XYLineChart_AWT( String applicationTitle, String chartTitle, int[][] bestFitness, int[][] averageFitness) {
+    public XYLineChart_AWT( String applicationTitle, String chartTitle, int[][] bestFitness, double[][] averageFitness, int generationLength) {
         super(applicationTitle);
         this.bestDataset = bestFitness;
         this.averageDataset = averageFitness;
+        this.generationLength = generationLength;
         JFreeChart xylineChart = ChartFactory.createXYLineChart(
                 chartTitle ,
                 "Generation" ,
@@ -150,13 +160,13 @@ class XYLineChart_AWT extends ApplicationFrame {
 
     private XYDataset createDataset( ) {
         final XYSeries best = new XYSeries( "Best" );
-        for(int gen = 0; gen < 1000; gen++){
+        for(int gen = 0; gen < generationLength; gen++){
             best.add(gen, bestDataset[0][gen]);
         }
 
 
         final XYSeries average = new XYSeries( "Average" );
-        for(int gen = 0; gen < 1000; gen++){
+        for(int gen = 0; gen < generationLength; gen++){
             average.add(gen, averageDataset[0][gen]);
         }
 
