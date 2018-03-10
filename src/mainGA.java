@@ -30,6 +30,9 @@ public class mainGA {
     static int [][] bestChangingUnimodalFitness;
     static int [][] averageChangingUnimodalFitness;
 
+    static double averageDeceptiveConvergence;
+    static double averageUnimodalConvergence;
+
     static List<Integer> convergenceValuesUnimodal = new ArrayList<Integer>();
     static List<Integer> convergenceValuesDeceptive = new ArrayList<>();
     static int totalConvergenceUnimodal = 0;
@@ -37,12 +40,16 @@ public class mainGA {
 
     static int generationLength;
     static int run;
+    static int maxRuns;
 
     public static void main (String args[]){
         int[] idealTask = new int[] {100,100,100};
 
-        for(run = 1; run <= 10; run++) {
 
+        run = 1;
+
+        while (run <=10){
+            maxRuns=run;
 //            GA run1 = new GA(300, 3, idealTask, 1000, 100, 10, 0, false, false);
 //            bestUnimodalFitness = run1.getBestFitness();
 //            averageUnimodalFitness = run1.getAverageFitness();
@@ -100,14 +107,21 @@ public class mainGA {
 //            chart4.pack( );
 //            RefineryUtilities.centerFrameOnScreen( chart4 );
 //            chart4.setVisible( true );
+
+            run++;
         }
 
-//        double averageUnimodalConvergence = totalConvergenceUnimodal/convergenceValuesUnimodal.size();
-        double averageDeceptiveConvergence = totalConvergenceDeceptive/convergenceValuesDeceptive.size();
+        if(convergenceValuesUnimodal.isEmpty()){
+            averageUnimodalConvergence = 0;
+        } else averageUnimodalConvergence = totalConvergenceUnimodal/convergenceValuesUnimodal.size();
+
+        if(convergenceValuesDeceptive.isEmpty()){
+            averageDeceptiveConvergence = 0;
+        } else averageDeceptiveConvergence = totalConvergenceDeceptive/convergenceValuesDeceptive.size();
 
         System.out.println("\t\t\t Total \t Runs \t Average gen");
-//        System.out.println("Unimodal\t\t10" + "\t\t" + convergenceValuesUnimodal.size() + "\t\t\t" + averageUnimodalConvergence);
-        System.out.println("Deceptive \t\t" + convergenceValuesDeceptive.size() + "\t\t\t\t" + averageDeceptiveConvergence);
+        System.out.println("Unimodal\t\t"+ maxRuns + "\t\t" + convergenceValuesUnimodal.size() + "\t\t\t" + averageUnimodalConvergence);
+        System.out.println("Deceptive \t\t" + maxRuns + "\t\t" + convergenceValuesDeceptive.size() + "\t\t\t" + averageDeceptiveConvergence);
 
     }
 }

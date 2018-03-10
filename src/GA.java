@@ -66,7 +66,7 @@ public class GA implements Comparator<List<List<Integer>>>{
         //initialise
         List<List<Integer>> population = initialise();
 
-
+//        System.out.println("Population size after init " + population.size());
 
         bestFitness = new int[1][generationLength];
         averageFitness = new double[1][generationLength];
@@ -81,8 +81,6 @@ public class GA implements Comparator<List<List<Integer>>>{
                 changingLandscape(idealTaskAllocation);
             }
 
-            //System.out.println("Generation " + gen);
-
             currentFitnessFunction = new ArrayList<>();
 
             //evaluation of Fitness Function
@@ -90,8 +88,11 @@ public class GA implements Comparator<List<List<Integer>>>{
                 currentFitnessFunction = deceptiveFitnessEvaluation(population);
             } else currentFitnessFunction = unimodalFitnessEvaluation(population);
 
+//            System.out.println("Size of the population after fitness evaluation " + currentFitnessFunction.size());
 
             List<List<Integer>> currentPopulation = tournamentSelection(population, currentFitnessFunction);
+
+//            System.out.println("Size population after tournament selection " + currentPopulation.size());
 
             population.clear();
 
@@ -128,10 +129,7 @@ public class GA implements Comparator<List<List<Integer>>>{
                 }.reversed());
             }
 
-//                for(int s = 0; s < tempFitness.length; s ++){
-//                    System.out.println(tempFitness[s][0]);
-//                    System.out.println(tempFitness[s][1]);
-//                }
+//            System.out.println("Size of the population after sorting " + tempFitness.length);
 
             //add top elite solutions
             for (int elite = 0; elite < elitismValue; elite++) {
@@ -141,6 +139,8 @@ public class GA implements Comparator<List<List<Integer>>>{
                 }
                 population.add(row);
             }
+
+//            System.out.println("Size of the population after elitism" + population.size());
 
             bestFitness[0][gen] = tempFitness[0][0];
             averageFitnessValue = totalFitnessValue/currentFitnessFunction.size();
@@ -153,16 +153,13 @@ public class GA implements Comparator<List<List<Integer>>>{
                         convergenceValue = gen;
                     }
                 }
-                else{//this part needs correction
+                else{
                     if(tempFitness[0][0] >= (maxFitnessFunction*taskNumber)){
                         isConverging = true;
                         convergenceValue = gen;
                     }
                 }
             }
-
-
-            //System.out.println("Fitness Size: " + currentFitnessFunction.size());
 
             //crossover
             for (int i = elitismValue; i < (Math.floor(currentPopulation.size() + elitismValue - mutationRate)/ 2); i++) {
@@ -231,6 +228,8 @@ public class GA implements Comparator<List<List<Integer>>>{
 
             }
 
+//            System.out.println("Size of the population after crossover " + population.size());
+
             //mutation
             for (int z = 0; z < mutationRate; z++) {
                 mutateChromosome = random.nextInt(currentPopulation.size());
@@ -253,6 +252,8 @@ public class GA implements Comparator<List<List<Integer>>>{
 //                        System.out.println(mutatedGene.get(u));
 //                    }
                 population.add(mutatedGene);
+
+//                System.out.println("Size of the population after mutation " + population.size());
             }
 
 
@@ -293,11 +294,6 @@ public class GA implements Comparator<List<List<Integer>>>{
             for(int j = 0; j < taskNumber; j++){
                 tempFitnessFunction+=abs((idealTaskAllocation[j] - population.get(i).get(j)));
             }
-            if(tempFitnessFunction >= 401){
-                for (int l = 0; l <taskNumber; l++){
-                    System.out.println(population.get(i).get(l));
-                }
-            }
             fitnessFunction.add(tempFitnessFunction);
         }
         return fitnessFunction;
@@ -310,7 +306,12 @@ public class GA implements Comparator<List<List<Integer>>>{
             //System.out.println("Pop size" + population.size());
             tempFitnessFunction = 0;
             for(int j = 0; j < taskNumber; j++){
+//                if(population.get(i).get(j) < 0){
+//                    System.out.println("Negative number");
+//                }
+//                System.out.println(idealTaskAllocation[j] + " - " + population.get(i).get(j) );
                 int difference = abs(idealTaskAllocation[j] - population.get(i).get(j));
+//                System.out.println(difference);
                 if(difference==0){
                     tempFitnessFunction+=maxFitnessFunction;
                 }
