@@ -49,6 +49,8 @@ public class mainGA {
         run = 1;
 
         while (run <=10){
+            System.out.println(run);
+            System.out.println("----------------------------------------");
             maxRuns=run;
 //            GA run1 = new GA(300, 3, idealTask, 1000, 100, 10, 0, false, false);
 //            bestUnimodalFitness = run1.getBestFitness();

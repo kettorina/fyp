@@ -2,7 +2,7 @@ import java.util.*;
 
 import static java.lang.Math.abs;
 
-public class GA implements Comparator<List<List<Integer>>>{
+public class GA implements Comparator<List<List<Integer>>> {
 
     static int remainingPopulationSize;
     static int currentPopulationSize;
@@ -13,11 +13,11 @@ public class GA implements Comparator<List<List<Integer>>>{
     static int errorOffspring2;
     static int maxFitnessFunction;
 
-    static int tournamentSize =2;
+    static int tournamentSize = 2;
     static int taskNumber;
     static int populationSize;
     static int chromosomeSize;
-    static int generationLength = 100;
+    static int generationLength = 10;
     static int[] idealTaskAllocation;
     static List<Integer> currentFitnessFunction;
 
@@ -27,6 +27,7 @@ public class GA implements Comparator<List<List<Integer>>>{
 
     static int mutateChromosome;
     static int mutateTask;
+    static int mutatedTask;
     static List<Integer> mutatedGene;
 
     static Random random = new Random();
@@ -46,7 +47,7 @@ public class GA implements Comparator<List<List<Integer>>>{
     static double averageFitnessValue = 0;
     //TODO: plot graphs
 
-    public GA(int popSize, int tasks, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing){
+    public GA(int popSize, int tasks, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing) {
         this.populationSize = popSize;
         this.taskNumber = tasks;
         this.idealTaskAllocation = taskAllocation;
@@ -61,7 +62,7 @@ public class GA implements Comparator<List<List<Integer>>>{
 
     }
 
-    public static void start(){
+    public static void start() {
 
         //initialise
         List<List<Integer>> population = initialise();
@@ -106,7 +107,7 @@ public class GA implements Comparator<List<List<Integer>>>{
                 tempFitness[count][0] = current;
                 tempFitness[count][1] = count;
 
-                totalFitnessValue+= current;
+                totalFitnessValue += current;
             }
 
             if (isDeceptive) {
@@ -143,18 +144,17 @@ public class GA implements Comparator<List<List<Integer>>>{
 //            System.out.println("Size of the population after elitism" + population.size());
 
             bestFitness[0][gen] = tempFitness[0][0];
-            averageFitnessValue = totalFitnessValue/currentFitnessFunction.size();
+            averageFitnessValue = totalFitnessValue / currentFitnessFunction.size();
             averageFitness[0][gen] = averageFitnessValue;
 
-            if(!isConverging){
-                if(!isDeceptive){
-                    if(Math.abs(averageFitnessValue-0.0) <= 0.000001){
+            if (!isConverging) {
+                if (!isDeceptive) {
+                    if (Math.abs(averageFitnessValue - 0.0) <= 0.000001) {
                         isConverging = true;
                         convergenceValue = gen;
                     }
-                }
-                else{
-                    if(tempFitness[0][0] >= (maxFitnessFunction*taskNumber)){
+                } else {
+                    if (tempFitness[0][0] >= (maxFitnessFunction * taskNumber)) {
                         isConverging = true;
                         convergenceValue = gen;
                     }
@@ -162,7 +162,7 @@ public class GA implements Comparator<List<List<Integer>>>{
             }
 
             //crossover
-            for (int i = elitismValue; i < (Math.floor(currentPopulation.size() + elitismValue - mutationRate)/ 2); i++) {
+            for (int i = elitismValue; i < (Math.floor(currentPopulation.size() + elitismValue - mutationRate) / 2); i++) {
                 tempSel1 = random.nextInt(currentPopulation.size());
                 tempSel2 = random.nextInt(currentPopulation.size());
                 List<Integer> offspring1 = new ArrayList<>();
@@ -232,25 +232,35 @@ public class GA implements Comparator<List<List<Integer>>>{
 
             //mutation
             for (int z = 0; z < mutationRate; z++) {
-                mutateChromosome = random.nextInt(currentPopulation.size());
-                mutateTask = random.nextInt(taskNumber);
-                mutatedGene = new ArrayList<>();
 
-//                   // System.out.println("Original gene");
-//                    for(int s = 0; s <taskNumber; s++){
-//                        System.out.println(currentPopulation.get(mutateChromosome).get(s));
-//                    }
+                int check;
+                do {
+//                    System.out.println("Current population: " + currentPopulation.size());
+                    mutateChromosome = random.nextInt(currentPopulation.size());
+                    mutateTask = random.nextInt(taskNumber);
+                    mutatedTask = random.nextInt(taskNumber);
+                    mutatedGene = new ArrayList<>();
+                    check = currentPopulation.get(mutateChromosome).get(mutatedTask) - 1;
+
+                } while ((mutateTask == mutatedTask) || (check < 0));
+
+                System.out.println("Original gene");
+                for (int s = 0; s < taskNumber; s++) {
+                    System.out.println(currentPopulation.get(mutateChromosome).get(s));
+                }
                 for (int x = 0; x < taskNumber; x++) {
                     if (x == mutateTask) {
-                        mutatedGene.add(currentPopulation.get(mutateChromosome).get(x) + 2);
-                    } else {
+                        mutatedGene.add(currentPopulation.get(mutateChromosome).get(x) + 1);
+                    } else if (x == mutatedTask) {
                         mutatedGene.add(currentPopulation.get(mutateChromosome).get(x) - 1);
+                    } else {
+                        mutatedGene.add(currentPopulation.get(mutateChromosome).get(x));
                     }
                 }
-//                    //System.out.println("Mutated gene");
-//                    for(int u = 0; u < taskNumber; u++){
-//                        System.out.println(mutatedGene.get(u));
-//                    }
+                System.out.println("Mutated gene");
+                for (int u = 0; u < taskNumber; u++) {
+                    System.out.println(mutatedGene.get(u));
+                }
                 population.add(mutatedGene);
 
 //                System.out.println("Size of the population after mutation " + population.size());
@@ -306,12 +316,8 @@ public class GA implements Comparator<List<List<Integer>>>{
             //System.out.println("Pop size" + population.size());
             tempFitnessFunction = 0;
             for(int j = 0; j < taskNumber; j++){
-//                if(population.get(i).get(j) < 0){
-//                    System.out.println("Negative number");
-//                }
-//                System.out.println(idealTaskAllocation[j] + " - " + population.get(i).get(j) );
                 int difference = abs(idealTaskAllocation[j] - population.get(i).get(j));
-//                System.out.println(difference);
+
                 if(difference==0){
                     tempFitnessFunction+=maxFitnessFunction;
                 }
