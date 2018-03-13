@@ -48,7 +48,7 @@ public class mainGA {
 
         run = 1;
 
-        while (run <=10){
+        while (run <=5){
             System.out.println(run);
             System.out.println("----------------------------------------");
             maxRuns=run;

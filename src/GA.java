@@ -163,18 +163,32 @@ public class GA implements Comparator<List<List<Integer>>> {
 
             //crossover
             for (int i = elitismValue; i < (Math.floor(currentPopulation.size() + elitismValue - mutationRate) / 2); i++) {
-                tempSel1 = random.nextInt(currentPopulation.size());
-                tempSel2 = random.nextInt(currentPopulation.size());
+                do{
+                    tempSel1 = random.nextInt(currentPopulation.size());
+                    tempSel2 = random.nextInt(currentPopulation.size());
+                }while (tempSel1 == tempSel2);
+
+                System.out.println("Original 1: ");
+                for (int ki = 0; ki < taskNumber; ki++){
+                    System.out.println(currentPopulation.get(tempSel1).get(ki));
+                }
+
+                System.out.println("Original 2: ");
+                for (int fi = 0; fi < taskNumber; fi++){
+                    System.out.println(currentPopulation.get(tempSel2).get(fi));
+                }
+
+                int split = 2;
                 List<Integer> offspring1 = new ArrayList<>();
                 List<Integer> offspring2 = new ArrayList<>();
                 for (int j = 0; j < taskNumber; j++) {
-                    if (j == taskNumber - 1) {
+                    if (j == split) {
                         offspring1.add(currentPopulation.get(tempSel2).get(j));
                         offspring2.add(currentPopulation.get(tempSel1).get(j));
                         errorOffspring1 = offspring1.get(j) - currentPopulation.get(tempSel1).get(j);
                         errorOffspring2 = offspring2.get(j) - currentPopulation.get(tempSel2).get(j);
-                        //                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-                        //                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
                         if (errorOffspring1 < 0) {
                             int redistribute = (int) Math.floor((abs(errorOffspring1) / taskNumber));
                             int remainder = abs(errorOffspring1) % taskNumber;
@@ -182,7 +196,7 @@ public class GA implements Comparator<List<List<Integer>>> {
                                 offspring1.set(k, offspring1.get(k) + redistribute);
                             }
                             if (remainder != 0) {
-                                offspring1.set(taskNumber - 1, offspring1.get(taskNumber - 1) + remainder);
+                                offspring1.set(split, offspring1.get(split) + remainder);
                             }
                         }
                         if (errorOffspring1 > 0) {
@@ -192,7 +206,7 @@ public class GA implements Comparator<List<List<Integer>>> {
                                 offspring1.set(k, offspring1.get(k) - redistribute);
                             }
                             if (remainder != 0) {
-                                offspring1.set(taskNumber - 1, offspring1.get(taskNumber - 1) - remainder);
+                                offspring1.set(split, offspring1.get(split) - remainder);
                             }
                         }
                         if (errorOffspring2 < 0) {
@@ -202,7 +216,7 @@ public class GA implements Comparator<List<List<Integer>>> {
                                 offspring2.set(k, offspring2.get(k) + redistribute);
                             }
                             if (remainder != 0) {
-                                offspring2.set(taskNumber - 1, offspring2.get(taskNumber - 1) + remainder);
+                                offspring2.set(split, offspring2.get(split) + remainder);
                             }
                         }
                         if (errorOffspring2 > 0) {
@@ -212,13 +226,13 @@ public class GA implements Comparator<List<List<Integer>>> {
                                 offspring2.set(k, offspring2.get(k) - redistribute);
                             }
                             if (remainder != 0) {
-                                offspring2.set(taskNumber - 1, offspring2.get(taskNumber - 1) - remainder);
+                                offspring2.set(split, offspring2.get(split) - remainder);
                             }
                         }
                         population.add(offspring1);
                         population.add(offspring2);
-                        //                        System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-                        //                        System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+                        System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+                        System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
                     } else {
                         offspring1.add(currentPopulation.get(tempSel1).get(j));
                         offspring2.add(currentPopulation.get(tempSel2).get(j));
@@ -244,10 +258,10 @@ public class GA implements Comparator<List<List<Integer>>> {
 
                 } while ((mutateTask == mutatedTask) || (check < 0));
 
-                System.out.println("Original gene");
-                for (int s = 0; s < taskNumber; s++) {
-                    System.out.println(currentPopulation.get(mutateChromosome).get(s));
-                }
+//                System.out.println("Original gene");
+//                for (int s = 0; s < taskNumber; s++) {
+//                    System.out.println(currentPopulation.get(mutateChromosome).get(s));
+//                }
                 for (int x = 0; x < taskNumber; x++) {
                     if (x == mutateTask) {
                         mutatedGene.add(currentPopulation.get(mutateChromosome).get(x) + 1);
@@ -257,15 +271,14 @@ public class GA implements Comparator<List<List<Integer>>> {
                         mutatedGene.add(currentPopulation.get(mutateChromosome).get(x));
                     }
                 }
-                System.out.println("Mutated gene");
-                for (int u = 0; u < taskNumber; u++) {
-                    System.out.println(mutatedGene.get(u));
-                }
+//                System.out.println("Mutated gene");
+//                for (int u = 0; u < taskNumber; u++) {
+//                    System.out.println(mutatedGene.get(u));
+//                }
                 population.add(mutatedGene);
 
 //                System.out.println("Size of the population after mutation " + population.size());
             }
-
 
             currentPopulation.clear();
             currentFitnessFunction.clear();
