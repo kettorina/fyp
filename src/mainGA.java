@@ -46,8 +46,6 @@ public class mainGA {
     static int totalSubOptimalConvergence;
 
     public static void main (String args[]){
-        int[] idealTask = new int[] {100,100,100};
-
 
         run = 1;
 
@@ -55,7 +53,9 @@ public class mainGA {
             System.out.println(run);
             System.out.println("----------------------------------------");
             maxRuns=run;
-            GA run1 = new GA(300, 3, idealTask, 1000, 100, 10, 0, false, false);
+
+            int[] idealTaskRun1 = new int[] {100,100,100};
+            GA run1 = new GA(300, 3, idealTaskRun1, 1000, 100, 10, 0, false, false);
             bestUnimodalFitness = run1.getBestFitness();
             averageUnimodalFitness = run1.getAverageFitness();
             generationLength = run1.getGenerationLength();
@@ -73,7 +73,8 @@ public class mainGA {
             chart.setVisible( true );
 
 
-            GA run2 = new GA(300, 3, idealTask, 1000, 20, 10, 0, false, true);
+            int[] idealTaskRun2 = new int[] {100,100,100};
+            GA run2 = new GA(300, 3, idealTaskRun2, 1000, 20, 10, 0, false, true);
             bestChangingUnimodalFitness = run2.getBestFitness();
             averageChangingUnimodalFitness = run2.getAverageFitness();
 
@@ -83,8 +84,11 @@ public class mainGA {
             RefineryUtilities.centerFrameOnScreen( chart2 );
             chart2.setVisible( true );
 
+            System.out.println(idealTaskRun2[0] + " " + idealTaskRun2[1] + " " + idealTaskRun2[2]);
 
-            GA run3 = new GA(300, 3, idealTask, 1000, 20, 10, 200, true, false);
+
+            int[] idealTaskRun3 = new int[] {100,100,100};
+            GA run3 = new GA(300, 3, idealTaskRun3, 1000, 20, 10, 200, true, false);
             bestDeceptiveFitness = run3.getBestFitness();
             averageDeceptiveFitness = run3.getAverageFitness();
             generationLength = run3.getGenerationLength();
@@ -107,7 +111,8 @@ public class mainGA {
             }
 
 
-            GA run4 = new GA(300, 3, idealTask, 1000, 20, 10, 200, true, true);
+            int[] idealTaskRun4 = new int[] {100,100,100};
+            GA run4 = new GA(300, 3, idealTaskRun4, 1000, 20, 10, 200, true, true);
             bestChangingDeceptiveFitness = run4.getBestFitness();
             averageChangingDeceptiveFitness = run4.getAverageFitness();
 
