@@ -17,7 +17,7 @@ public class GA implements Comparator<List<List<Integer>>> {
     static int taskNumber;
     static int populationSize;
     static int chromosomeSize;
-    static int generationLength = 10;
+    static int generationLength = 100;
     static int[] idealTaskAllocation;
     static List<Integer> currentFitnessFunction;
 
@@ -154,10 +154,11 @@ public class GA implements Comparator<List<List<Integer>>> {
                         convergenceValue = gen;
                     }
                 } else {
-                    if (tempFitness[0][0] >= (maxFitnessFunction * taskNumber)) {
+                    if (Math.abs(averageFitnessValue - (maxFitnessFunction * taskNumber)) <= 0.000001) {
                         isConverging = true;
                         convergenceValue = gen;
                     }
+
                 }
             }
 
@@ -168,15 +169,15 @@ public class GA implements Comparator<List<List<Integer>>> {
                     tempSel2 = random.nextInt(currentPopulation.size());
                 }while (tempSel1 == tempSel2);
 
-                System.out.println("Original 1: ");
-                for (int ki = 0; ki < taskNumber; ki++){
-                    System.out.println(currentPopulation.get(tempSel1).get(ki));
-                }
+//                System.out.println("Original 1: ");
+//                for (int ki = 0; ki < taskNumber; ki++){
+//                    System.out.println(currentPopulation.get(tempSel1).get(ki));
+//                }
 
-                System.out.println("Original 2: ");
-                for (int fi = 0; fi < taskNumber; fi++){
-                    System.out.println(currentPopulation.get(tempSel2).get(fi));
-                }
+//                System.out.println("Original 2: ");
+//                for (int fi = 0; fi < taskNumber; fi++){
+//                    System.out.println(currentPopulation.get(tempSel2).get(fi));
+//                }
 
                 int split = 2;
                 List<Integer> offspring1 = new ArrayList<>();
@@ -187,52 +188,109 @@ public class GA implements Comparator<List<List<Integer>>> {
                         offspring2.add(currentPopulation.get(tempSel1).get(j));
                         errorOffspring1 = offspring1.get(j) - currentPopulation.get(tempSel1).get(j);
                         errorOffspring2 = offspring2.get(j) - currentPopulation.get(tempSel2).get(j);
-                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+//                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+//                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
                         if (errorOffspring1 < 0) {
                             int redistribute = (int) Math.floor((abs(errorOffspring1) / taskNumber));
                             int remainder = abs(errorOffspring1) % taskNumber;
-                            for (int k = 0; k < taskNumber; k++) {
-                                offspring1.set(k, offspring1.get(k) + redistribute);
-                            }
-                            if (remainder != 0) {
-                                offspring1.set(split, offspring1.get(split) + remainder);
+                            //if there isn't enough redistribute, this prevents from assigning back to the split cell
+                            if(redistribute == 0){
+                                int unDistributedRemainder = remainder;
+                                for (int k = 0; k < taskNumber; k++) {
+                                    if((k == split) || (unDistributedRemainder==0)){
+                                        continue;
+                                    }
+                                    if(k != split){
+                                        offspring1.set(k, offspring1.get(k) + 1);
+                                        unDistributedRemainder-= 1;
+                                    }
+                                }
+                            }else{
+                                for (int k = 0; k < taskNumber; k++) {
+                                    offspring1.set(k, offspring1.get(k) + redistribute);
+                                }
+                                if (remainder != 0) {
+                                    offspring1.set(split, offspring1.get(split) + remainder);
+                                }
                             }
                         }
                         if (errorOffspring1 > 0) {
                             int redistribute = (int) Math.floor((abs(errorOffspring1) / taskNumber));
                             int remainder = abs(errorOffspring1) % taskNumber;
-                            for (int k = 0; k < taskNumber; k++) {
-                                offspring1.set(k, offspring1.get(k) - redistribute);
+                            if(redistribute==0){
+                                int unDistributedRemainder = remainder;
+                                for(int k = 0; k < taskNumber; k++){
+                                    if ((k == split) || (unDistributedRemainder == 0)){
+                                        continue;
+                                    }
+                                    if (k != split) {
+                                        offspring1.set(k, offspring1.get(k) - 1);
+                                        unDistributedRemainder-= 1;
+                                    }
+                                }
                             }
-                            if (remainder != 0) {
-                                offspring1.set(split, offspring1.get(split) - remainder);
+                            else{
+                                for (int k = 0; k < taskNumber; k++) {
+                                    offspring1.set(k, offspring1.get(k) - redistribute);
+                                }
+                                if (remainder != 0) {
+                                    offspring1.set(split, offspring1.get(split) - remainder);
+                                }
                             }
                         }
                         if (errorOffspring2 < 0) {
                             int redistribute = (int) Math.floor((abs(errorOffspring2) / taskNumber));
                             int remainder = abs(errorOffspring2) % taskNumber;
-                            for (int k = 0; k < taskNumber; k++) {
-                                offspring2.set(k, offspring2.get(k) + redistribute);
+                            if(redistribute == 0){
+                                int unDistributedRemainder = remainder;
+                                for(int k = 0; k < taskNumber; k++) {
+                                    if ((k==split) || (unDistributedRemainder == 0)){
+                                        continue;
+                                    }
+                                    if (k != split) {
+                                        offspring2.set(k, offspring2.get(k) + 1);
+                                        unDistributedRemainder-=1;
+                                    }
+                                }
                             }
-                            if (remainder != 0) {
-                                offspring2.set(split, offspring2.get(split) + remainder);
+                            else {
+                                for (int k = 0; k < taskNumber; k++) {
+                                    offspring2.set(k, offspring2.get(k) + redistribute);
+                                }
+                                if (remainder != 0) {
+                                    offspring2.set(split, offspring2.get(split) + remainder);
+                                }
                             }
+
                         }
                         if (errorOffspring2 > 0) {
                             int redistribute = (int) Math.floor((abs(errorOffspring2) / taskNumber));
                             int remainder = abs(errorOffspring2) % taskNumber;
-                            for (int k = 0; k < taskNumber; k++) {
-                                offspring2.set(k, offspring2.get(k) - redistribute);
+                            if(redistribute == 0){
+                                int unDistributedRemainder = remainder;
+                                for(int k = 0; k <taskNumber; k++){
+                                    if ((k == split) || (unDistributedRemainder == 0)){
+                                        continue;
+                                    }
+                                    if (k != split){
+                                        offspring2.set(k, offspring2.get(k) - 1);
+                                        unDistributedRemainder -= 1;
+                                    }
+                                }
                             }
-                            if (remainder != 0) {
-                                offspring2.set(split, offspring2.get(split) - remainder);
+                            else{
+                                for (int k = 0; k < taskNumber; k++) {
+                                    offspring2.set(k, offspring2.get(k) - redistribute);
+                                }
+                                if (remainder != 0) {
+                                    offspring2.set(split, offspring2.get(split) - remainder);
+                                }
                             }
                         }
                         population.add(offspring1);
                         population.add(offspring2);
-                        System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-                        System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+//                        System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+//                        System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
                     } else {
                         offspring1.add(currentPopulation.get(tempSel1).get(j));
                         offspring2.add(currentPopulation.get(tempSel2).get(j));
@@ -326,7 +384,6 @@ public class GA implements Comparator<List<List<Integer>>> {
         List<Integer> fitnessFunction = new ArrayList<>();
 
         for(int i = 0; i < population.size(); i++){
-            //System.out.println("Pop size" + population.size());
             tempFitnessFunction = 0;
             for(int j = 0; j < taskNumber; j++){
                 int difference = abs(idealTaskAllocation[j] - population.get(i).get(j));

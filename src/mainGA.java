@@ -48,26 +48,26 @@ public class mainGA {
 
         run = 1;
 
-        while (run <=5){
+        while (run <=10){
             System.out.println(run);
             System.out.println("----------------------------------------");
             maxRuns=run;
-//            GA run1 = new GA(300, 3, idealTask, 1000, 100, 10, 0, false, false);
-//            bestUnimodalFitness = run1.getBestFitness();
-//            averageUnimodalFitness = run1.getAverageFitness();
-//            generationLength = run1.getGenerationLength();
-//            if (run1.getIsConverging()) {
+            GA run1 = new GA(300, 3, idealTask, 1000, 100, 10, 0, false, false);
+            bestUnimodalFitness = run1.getBestFitness();
+            averageUnimodalFitness = run1.getAverageFitness();
+            generationLength = run1.getGenerationLength();
+            if (run1.getIsConverging()) {
 //                System.out.println(run1.getConvergenceValue());
-//                totalConvergenceUnimodal += run1.getConvergenceValue();
-//                convergenceValuesUnimodal.add(run1.getConvergenceValue());
-//                run1.setIsConverging(false);
-//            }
-//
-//            XYLineChart_AWT chart = new XYLineChart_AWT("Fitness Unimodal Function",
-//                    "Fitness Unimodal Function Run " + run, bestUnimodalFitness, averageUnimodalFitness, generationLength);
-//            chart.pack( );
-//            RefineryUtilities.centerFrameOnScreen( chart );
-//            chart.setVisible( true );
+                totalConvergenceUnimodal += run1.getConvergenceValue();
+                convergenceValuesUnimodal.add(run1.getConvergenceValue());
+                run1.setIsConverging(false);
+            }
+
+            XYLineChart_AWT chart = new XYLineChart_AWT("Fitness Unimodal Function",
+                    "Fitness Unimodal Function Run " + run, bestUnimodalFitness, averageUnimodalFitness, generationLength);
+            chart.pack( );
+            RefineryUtilities.centerFrameOnScreen( chart );
+            chart.setVisible( true );
 //
 //
 //            GA run2 = new GA(300, 3, idealTask, 1000, 20, 10, 0, false, true);
@@ -81,7 +81,7 @@ public class mainGA {
 //            chart2.setVisible( true );
 //
 //
-            GA run3 = new GA(300, 3, idealTask, 1000, 20, 10, 150, true, false);
+            GA run3 = new GA(300, 3, idealTask, 1000, 20, 10, 200, true, false);
             bestDeceptiveFitness = run3.getBestFitness();
             averageDeceptiveFitness = run3.getAverageFitness();
             generationLength = run3.getGenerationLength();
