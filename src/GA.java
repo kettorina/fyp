@@ -13,7 +13,7 @@ public class GA implements Comparator<List<List<Integer>>> {
     static int errorOffspring2;
     static int maxFitnessFunction;
 
-    static int tournamentSize = 2;
+    static int tournamentSize;
     static int taskNumber;
     static int populationSize;
     static int chromosomeSize;
@@ -53,7 +53,7 @@ public class GA implements Comparator<List<List<Integer>>> {
 
 
 
-    public GA(int popSize, int tasks, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing, int change) {
+    public GA(int popSize, int tasks, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing, int change, int tournamentSize) {
         this.populationSize = popSize;
         this.taskNumber = tasks;
         this.idealTaskAllocation = taskAllocation;
@@ -70,6 +70,10 @@ public class GA implements Comparator<List<List<Integer>>> {
             this.changeGenValue = 2;
         }
         else this.changeGenValue = change;
+
+        if(tournamentSize == 0){
+            this.tournamentSize = 2;
+        }else this.tournamentSize = tournamentSize;
 
         start();
 
@@ -139,13 +143,13 @@ public class GA implements Comparator<List<List<Integer>>> {
                 }.reversed());
             }
 
-//            System.out.println("Size of the population after sorting " + tempFitness.length);
+            System.out.println("Size of the population after sorting " + tempFitness.length);
 
             List<List<Integer>> currentElite = elitism(elitismValue, tempFitness, population);
 
-            List<List<Integer>> currentPopulation = tournamentSelection(population, currentFitnessFunction);
+            List<List<Integer>> currentPopulation = tournamentSelection(population, currentFitnessFunction, tournamentSize);
 
-//            System.out.println("Size population after tournament selection " + currentPopulation.size());
+            System.out.println("Size population after tournament selection " + currentPopulation.size());
 
             population.clear();
 
@@ -154,7 +158,7 @@ public class GA implements Comparator<List<List<Integer>>> {
             }
 
 
-//            System.out.println("Size of the population after elitism" + population.size());
+            System.out.println("Size of the population after elitism" + population.size());
 
             bestFitness[0][gen] = tempFitness[0][0];
             averageFitnessValue = totalFitnessValue / currentFitnessFunction.size();
@@ -168,6 +172,7 @@ public class GA implements Comparator<List<List<Integer>>> {
                     }
                 } else {
                     if (Math.abs(averageFitnessValue - (maxFitnessFunction * taskNumber)) <= 0.000001) {
+                        System.out.println(averageFitnessValue);
                         isConverging = true;
                         convergenceValue = gen;
                     }
@@ -263,6 +268,8 @@ public class GA implements Comparator<List<List<Integer>>> {
 
     public static List<List<Integer>> elitism(int elitismValue, int[][] temp, List<List<Integer>> currentPopulation){
 
+        System.out.println("-------------------Elitism-----------------");
+
         List<List<Integer>> elitePopulation = new ArrayList<>();
 
         for (int elite = 0; elite < elitismValue; elite++) {
@@ -276,42 +283,52 @@ public class GA implements Comparator<List<List<Integer>>> {
         return elitePopulation;
     }
 
-    public static List<List<Integer>> tournamentSelection(List<List<Integer>> pop, List<Integer> fitnessFunction){
+    public static List<List<Integer>> tournamentSelection(List<List<Integer>> pop, List<Integer> fitnessFunction, int tournamentSize){
 
         List<List<Integer>> currentPopulation = new ArrayList<>();
 
-        int tempValue1;
-        int tempValue2;
-
         for(int i = 0; i < pop.size(); i++){
+
+            int[][] tournament = new int[tournamentSize][2];
             List<Integer> row = new ArrayList<>();
-            tempValue1 = random.nextInt(pop.size()) + 0;
-            tempValue2 = random.nextInt(pop.size()) + 0;
+
+            for(int j = 0; j < tournamentSize; j++){
+                tournament[j][0] = random.nextInt(pop.size());
+                tournament[j][1] = fitnessFunction.get(tournament[j][0]);
+            }
+
+
 
             //if the fitness function awards minimal values
             if(!isDeceptive){
-                if(fitnessFunction.get(tempValue1) >= fitnessFunction.get(tempValue2)){
-                    for(int j = 0; j <taskNumber; j++){
-                        row.add(pop.get(tempValue2).get(j));
+
+                Arrays.sort(tournament, new Comparator<int[]>() {
+                    @Override
+                    public int compare(int[] o1, int[] o2) {
+                        final Integer value1 = o1[1];
+                        final Integer value2 = o2[1];
+                        return value2.compareTo(value1);
                     }
-                }else{
+                }.reversed());
                     for(int j = 0; j <taskNumber; j++){
-                        row.add(pop.get(tempValue1).get(j));
+                        row.add(pop.get(tournament[0][0]).get(j));
                     }
-                }
 
             }
             //else if the fitness function awards maximum values
             else {
-                if(fitnessFunction.get(tempValue1) <= fitnessFunction.get(tempValue2)){
-                    for(int j = 0; j <taskNumber; j++){
-                        row.add(pop.get(tempValue2).get(j));
+
+                Arrays.sort(tournament, new Comparator<int[]>() {
+                    @Override
+                    public int compare(int[] o1, int[] o2) {
+                        final Integer value1 = o1[1];
+                        final Integer value2 = o2[1];
+                        return value2.compareTo(value1);
                     }
-                }
-                else {
-                    for (int j = 0; j < taskNumber; j++){
-                        row.add(pop.get(tempValue1).get(j));
-                    }
+                });
+
+                for(int j = 0; j <taskNumber; j++) {
+                    row.add(pop.get(tournament[0][0]).get(j));
                 }
             }
 
@@ -324,6 +341,8 @@ public class GA implements Comparator<List<List<Integer>>> {
 
     public static List<List<Integer>> roundRobinConstraintCrossover (double crossoverNum, List<List<Integer>> currentPopulation){
         List<List<Integer>> crossoverPopulation = new ArrayList<>();
+
+        System.out.println("---------------------Crossover--------------------------");
 
         //crossover
         for (int i = 0; i < crossoverNum; i++) {
@@ -423,6 +442,8 @@ public class GA implements Comparator<List<List<Integer>>> {
     }
 
     public static List<List<Integer>> mutation(int mutationRate, List<List<Integer>> currentPopulation){
+
+        System.out.println("----------------Mutation------------------");
         List<List<Integer>> mutatedPopulation = new ArrayList<>();
 
         for (int i = 0; i < mutationRate; i++) {

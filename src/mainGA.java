@@ -44,7 +44,7 @@ public class mainGA {
             maxRuns=run;
 
             int[] idealTaskRun1 = new int[] {100,100,100};
-            GA run1 = new GA(300, 3, idealTaskRun1, 1000, 100, 10, 0, false, false, 0);
+            GA run1 = new GA(300, 3, idealTaskRun1, 1000, 100, 10, 0, false, false, 0, 7);
             int [][] bestUnimodalFitness = run1.getBestFitness();
             double [] [] averageUnimodalFitness = run1.getAverageFitness();
             generationLength = run1.getGenerationLength();
@@ -63,7 +63,7 @@ public class mainGA {
 
 
             int[] idealTaskRun2 = new int[] {100,100,100};
-            GA run2 = new GA(300, 3, idealTaskRun2, 1000, 20, 10, 0, false, true, 10);
+            GA run2 = new GA(300, 3, idealTaskRun2, 1000, 20, 10, 0, false, true, 10, 7);
             int [][] bestChangingUnimodalFitness = run2.getBestFitness();
             double [][] averageChangingUnimodalFitness = run2.getAverageFitness();
 
@@ -78,7 +78,7 @@ public class mainGA {
 
 
             int[] idealTaskRun3 = new int[] {10,10,10};
-            GA run3 = new GA(30, 3, idealTaskRun3, 10, 2, 1, 200, true, false, 0);
+            GA run3 = new GA(30, 3, idealTaskRun3, 10, 2, 1, 200, true, false, 0, 2);
             int [][] bestDeceptiveFitness = run3.getBestFitness();
             double [][]averageDeceptiveFitness = run3.getAverageFitness();
             generationLength = run3.getGenerationLength();
@@ -103,7 +103,7 @@ public class mainGA {
 
 
             int[] idealTaskRun4 = new int[] {100,100,100};
-            GA run4 = new GA(300, 3, idealTaskRun4, 1000, 20, 10, 200, true, true, 10);
+            GA run4 = new GA(300, 3, idealTaskRun4, 1000, 20, 10, 200, true, true, 10, 2);
             int [][] bestChangingDeceptiveFitness = run4.getBestFitness();
             double [][] averageChangingDeceptiveFitness = run4.getAverageFitness();
 
