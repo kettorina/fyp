@@ -15,9 +15,10 @@ public class GA implements Comparator<List<List<Integer>>> {
 
     static int tournamentSize;
     static int taskNumber;
+    static int split;
     static int populationSize;
     static int chromosomeSize;
-    static int generationLength = 1000;
+    static int generationLength;
     static int[] idealTaskAllocation;
     static List<Integer> currentFitnessFunction;
 
@@ -34,28 +35,29 @@ public class GA implements Comparator<List<List<Integer>>> {
 
     static boolean isDeceptive;
     static boolean isChangingLandscape;
+    static boolean isSizeConstrained;
 
     static int[] originalTaskAlloc;
     static int[][] bestFitness;
     static double[][] averageFitness;
 
-    //will hold the average value it took to converge
-    static boolean isConverging = false;
-    static int convergenceValue;
-
     static int totalFitnessValue = 0;
     static double averageFitnessValue = 0;
 
-    static double subOptimal;
-    static boolean isSubOptimalConvergence = false;
 
     static int changeGenValue;
 
+    //TODO: convergence values
+    //TODO: another crossover
+    //TODO: comments
+    //TODO: suboptimal values
+    //TODO: generation
 
 
-    public GA(int popSize, int tasks, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing, int change, int tournamentSize) {
+    public GA(int popSize, int tasks,int split, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing, int change, int tournamentSize, boolean sizeRestricted, int generationLength) {
         this.populationSize = popSize;
         this.taskNumber = tasks;
+        this.split = split;
         this.idealTaskAllocation = taskAllocation;
         this.chromosomeSize = solutions;
         this.elitismValue = elite;
@@ -63,8 +65,11 @@ public class GA implements Comparator<List<List<Integer>>> {
         this.maxFitnessFunction = maxFitness;
         this.isDeceptive = deceptive;
         this.isChangingLandscape = changing;
+        this.isSizeConstrained = sizeRestricted;
 
-        this.subOptimal = calculateSubOptimalSolution(idealTaskAllocation, popSize);
+        this.generationLength = generationLength;
+
+//        this.subOptimal = calculateSubOptimalSolution(idealTaskAllocation, popSize);
 
         if(isChangingLandscape && change == 0){
             this.changeGenValue = 2;
@@ -96,15 +101,23 @@ public class GA implements Comparator<List<List<Integer>>> {
             averageFitnessValue = 0;
 
             if (isChangingLandscape && gen == Math.floor(generationLength / changeGenValue)) {
-                changingLandscape(idealTaskAllocation);
+                idealTaskAllocation = changingLandscape(idealTaskAllocation);
             }
 
             currentFitnessFunction = new ArrayList<>();
 
             //evaluation of Fitness Function
-            if (isDeceptive) {
-                currentFitnessFunction = deceptiveFitnessEvaluation(population);
-            } else currentFitnessFunction = unimodalFitnessEvaluation(population);
+            if(isSizeConstrained){
+                if (isDeceptive) {
+                    currentFitnessFunction = deceptiveFitnessEvaluation(population);
+                } else currentFitnessFunction = unimodalFitnessEvaluation(population);
+            }
+            else{
+                if(isDeceptive){
+                    currentFitnessFunction = sizeRestrictedDeceptiveFitnessEvaluation(population);
+                }else currentFitnessFunction = sizeRestrictedUnimodalFitnessEvaluation(population);
+            }
+
 
 //            System.out.println("Size of the population after fitness evaluation " + currentFitnessFunction.size());
 
@@ -143,13 +156,13 @@ public class GA implements Comparator<List<List<Integer>>> {
                 }.reversed());
             }
 
-            System.out.println("Size of the population after sorting " + tempFitness.length);
+//            System.out.println("Size of the population after sorting " + tempFitness.length);
 
             List<List<Integer>> currentElite = elitism(elitismValue, tempFitness, population);
 
             List<List<Integer>> currentPopulation = tournamentSelection(population, currentFitnessFunction, tournamentSize);
 
-            System.out.println("Size population after tournament selection " + currentPopulation.size());
+//            System.out.println("Size population after tournament selection " + currentPopulation.size());
 
             population.clear();
 
@@ -158,44 +171,28 @@ public class GA implements Comparator<List<List<Integer>>> {
             }
 
 
-            System.out.println("Size of the population after elitism" + population.size());
+//            System.out.println("Size of the population after elitism " + population.size());
 
             bestFitness[0][gen] = tempFitness[0][0];
             averageFitnessValue = totalFitnessValue / currentFitnessFunction.size();
             averageFitness[0][gen] = averageFitnessValue;
 
-            if (!isConverging) {
-                if (!isDeceptive) {
-                    if (Math.abs(averageFitnessValue - 0.0) <= 0.000001) {
-                        isConverging = true;
-                        convergenceValue = gen;
-                    }
-                } else {
-                    if (Math.abs(averageFitnessValue - (maxFitnessFunction * taskNumber)) <= 0.000001) {
-                        System.out.println(averageFitnessValue);
-                        isConverging = true;
-                        convergenceValue = gen;
-                    }
-//                    if(!isSubOptimalConvergence){
-//                        if(abs(averageFitnessValue - subOptimal) <= 0.000001){
-//                            //there is a possibility it can find the non-suboptimal solution, therefore the flag is still set to false
-//                            convergenceValue = gen;
-//                            isSubOptimalConvergence = true;
-//                        }
-//                    }
-                }
-            }
-
             //crossover
             double crossoverNumber = (currentPopulation.size() - elitismValue - mutationRate) / 2;
-            System.out.println(crossoverNumber);
-            List<List<Integer>> crossoverPopulation = roundRobinConstraintCrossover(crossoverNumber, currentPopulation);
+            List<List<Integer>> crossoverPopulation = new ArrayList<>();
+//            System.out.println(crossoverNumber);
+
+            if(isSizeConstrained){
+                crossoverPopulation = averageConstraintCrossover(crossoverNumber, currentPopulation);
+            }else crossoverPopulation = unConstrainedCrosover(crossoverNumber, currentPopulation);
+
+
 
             for(List<Integer> curr: crossoverPopulation){
                 population.add(curr);
             }
 
-            System.out.println("Size of the population after crossover " + population.size());
+//            System.out.println("Size of the population after crossover " + population.size());
 
             List<List<Integer>> mutatedPopulation = mutation(mutationRate, currentPopulation);
 
@@ -266,9 +263,49 @@ public class GA implements Comparator<List<List<Integer>>> {
         return fitnessFunction;
     }
 
+    public static List<Integer> sizeRestrictedUnimodalFitnessEvaluation(List<List<Integer>> population){
+        List<Integer> fitnessFunction = new ArrayList<>();
+        for(int i = 0; i <population.size(); i++){
+            tempFitnessFunction = 0;
+            int totalPopulation = 0;
+            for(int j = 0; j < taskNumber; j++){
+                tempFitnessFunction+=abs((idealTaskAllocation[j] - population.get(i).get(j)));
+                totalPopulation += population.get(i).get(j);
+            }
+
+            tempFitnessFunction += abs((populationSize - totalPopulation));
+
+            fitnessFunction.add(tempFitnessFunction);
+        }
+        return  fitnessFunction;
+    }
+
+    public static List<Integer> sizeRestrictedDeceptiveFitnessEvaluation(List<List<Integer>> population){
+        List<Integer> fitnessFunction = new ArrayList<>();
+
+        for(int i = 0; i < population.size(); i++){
+            tempFitnessFunction = 0;
+            int totalPopulation = 0;
+            for(int j = 0; j < taskNumber; j++){
+                int difference = abs(idealTaskAllocation[j] - population.get(i).get(j));
+                totalPopulation += population.get(i).get(j);
+                if(difference==0){
+                    tempFitnessFunction+=maxFitnessFunction;
+                }
+                else tempFitnessFunction += difference;
+            }
+
+            tempFitnessFunction -= abs((populationSize - totalPopulation));
+
+            fitnessFunction.add(tempFitnessFunction);
+        }
+
+        return fitnessFunction;
+    }
+
     public static List<List<Integer>> elitism(int elitismValue, int[][] temp, List<List<Integer>> currentPopulation){
 
-        System.out.println("-------------------Elitism-----------------");
+//        System.out.println("-------------------Elitism-----------------");
 
         List<List<Integer>> elitePopulation = new ArrayList<>();
 
@@ -296,8 +333,6 @@ public class GA implements Comparator<List<List<Integer>>> {
                 tournament[j][0] = random.nextInt(pop.size());
                 tournament[j][1] = fitnessFunction.get(tournament[j][0]);
             }
-
-
 
             //if the fitness function awards minimal values
             if(!isDeceptive){
@@ -339,10 +374,53 @@ public class GA implements Comparator<List<List<Integer>>> {
         return currentPopulation;
     }
 
-    public static List<List<Integer>> roundRobinConstraintCrossover (double crossoverNum, List<List<Integer>> currentPopulation){
+    public static List<List<Integer>> unConstrainedCrosover(double crossoverNum, List<List<Integer>> currentPopulation) {
         List<List<Integer>> crossoverPopulation = new ArrayList<>();
 
-        System.out.println("---------------------Crossover--------------------------");
+//        System.out.println("---------------------Crossover--------------------------");
+
+        //crossover
+        for (int i = 0; i < crossoverNum; i++) {
+
+            do {
+                tempSel1 = random.nextInt(currentPopulation.size());
+                tempSel2 = random.nextInt(currentPopulation.size());
+            } while (tempSel1 == tempSel2);
+
+//                System.out.println("Original 1: ");
+//                for (int ki = 0; ki < taskNumber; ki++){
+//                    System.out.println(currentPopulation.get(tempSel1).get(ki));
+//                }
+//
+//                System.out.println("Original 2: ");
+//                for (int fi = 0; fi < taskNumber; fi++){
+//                    System.out.println(currentPopulation.get(tempSel2).get(fi));
+//                }
+
+            List<Integer> offspring1 = new ArrayList<>();
+            List<Integer> offspring2 = new ArrayList<>();
+
+            for (int j = 0; j < taskNumber; j++) {
+                if (j >= split) {
+                    offspring1.add(currentPopulation.get(tempSel2).get(j));
+                    offspring2.add(currentPopulation.get(tempSel1).get(j));
+                } else {
+                    offspring1.add(currentPopulation.get(tempSel1).get(j));
+                    offspring2.add(currentPopulation.get(tempSel2).get(j));
+                }
+            }
+
+            crossoverPopulation.add(offspring1);
+            crossoverPopulation.add(offspring2);
+        }
+
+        return crossoverPopulation;
+    }
+
+    public static List<List<Integer>> averageConstraintCrossover (double crossoverNum, List<List<Integer>> currentPopulation){
+        List<List<Integer>> crossoverPopulation = new ArrayList<>();
+
+//        System.out.println("---------------------Crossover--------------------------");
 
         //crossover
         for (int i = 0; i < crossoverNum; i++) {
@@ -362,79 +440,84 @@ public class GA implements Comparator<List<List<Integer>>> {
 //                    System.out.println(currentPopulation.get(tempSel2).get(fi));
 //                }
 
-            int split = 2;
             List<Integer> offspring1 = new ArrayList<>();
             List<Integer> offspring2 = new ArrayList<>();
+            errorOffspring1 = 0;
+            errorOffspring2 = 0;
             for (int j = 0; j < taskNumber; j++) {
-                if (j == split) {
+                if (j >= split) {
                     offspring1.add(currentPopulation.get(tempSel2).get(j));
                     offspring2.add(currentPopulation.get(tempSel1).get(j));
-                    errorOffspring1 = offspring1.get(j) - currentPopulation.get(tempSel1).get(j);
-                    errorOffspring2 = offspring2.get(j) - currentPopulation.get(tempSel2).get(j);
-//                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-//                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
-                    if(errorOffspring1 < 0){
-                        int remainder = abs(errorOffspring1);
-                        int unDistributed = remainder;
-                        while (unDistributed!=0){
-                            for(int k = 0; k < taskNumber; k++){
-                                if(unDistributed == 0 ) break;
-                                offspring1.set(k, offspring1.get(k) + 1);
-                                unDistributed -= 1;
-                            }
-                        }
-                    }
-                    if(errorOffspring1 > 0){
-                        int remainder = abs(errorOffspring1);
-                        int unDistributed = remainder;
-                        while (unDistributed!=0){
-                            for(int k = 0; k < taskNumber; k++){
-                                if(unDistributed==0) break;
-                                if((offspring1.get(k) - 1) < 0){
-                                    continue;
-                                } else {
-                                    offspring1.set(k, offspring1.get(k) - 1);
-                                    unDistributed -= 1;
-                                }
-                            }
-                        }
-                    }
-                    if(errorOffspring2 < 0){
-                        int remainder = abs(errorOffspring2);
-                        int unDistributed = remainder;
-                        while (unDistributed!=0){
-                            for(int k = 0; k < taskNumber; k++){
-                                if (unDistributed == 0) break;
-                                offspring2.set(k, offspring2.get(k) + 1);
-                                unDistributed -= 1;
-                            }
-                        }
-                    }
-                    if(errorOffspring2 > 0){
-                        int remainder = abs(errorOffspring2);
-                        int unDistributed = remainder;
-                        while (unDistributed!=0){
-                            for(int k = 0; k < taskNumber; k++){
-                                if(unDistributed == 0) break;
-                                if((offspring2.get(k) - 1) < 0){
-                                    continue;
-                                } else {
-                                    offspring2.set(k, offspring2.get(k) - 1);
-                                    unDistributed -= 1;
-                                }
-                            }
-                        }
-                    }
-                    crossoverPopulation.add(offspring1);
-                    crossoverPopulation.add(offspring2);
-//                        System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-//                        System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+                    errorOffspring1 +=  offspring1.get(j) - currentPopulation.get(tempSel1).get(j);
+                    errorOffspring2 += offspring2.get(j) - currentPopulation.get(tempSel2).get(j);
+
+//                    System.out.println(errorOffspring1);
+//                    System.out.println(errorOffspring2);
                 } else {
                     offspring1.add(currentPopulation.get(tempSel1).get(j));
                     offspring2.add(currentPopulation.get(tempSel2).get(j));
                 }
 
             }
+//                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+//                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+            if(errorOffspring1 < 0){
+                int remainder = abs(errorOffspring1);
+                int unDistributed = remainder;
+                while (unDistributed!=0){
+                    for(int k = 0; k < taskNumber; k++){
+                        if(unDistributed == 0 ) break;
+                        offspring1.set(k, offspring1.get(k) + 1);
+                        unDistributed -= 1;
+                    }
+                }
+            }
+            if(errorOffspring1 > 0){
+                int remainder = abs(errorOffspring1);
+                int unDistributed = remainder;
+                while (unDistributed!=0){
+                    for(int k = 0; k < taskNumber; k++){
+                        if(unDistributed==0) break;
+                        if((offspring1.get(k) - 1) < 0){
+                            continue;
+                        } else {
+                            offspring1.set(k, offspring1.get(k) - 1);
+                            unDistributed -= 1;
+                        }
+                    }
+                }
+            }
+            if(errorOffspring2 < 0){
+                int remainder = abs(errorOffspring2);
+                int unDistributed = remainder;
+                while (unDistributed!=0){
+                    for(int k = 0; k < taskNumber; k++){
+                        if (unDistributed == 0) break;
+                        offspring2.set(k, offspring2.get(k) + 1);
+                        unDistributed -= 1;
+                    }
+                }
+            }
+            if(errorOffspring2 > 0){
+                int remainder = abs(errorOffspring2);
+                int unDistributed = remainder;
+                while (unDistributed!=0){
+                    for(int k = 0; k < taskNumber; k++){
+                        if(unDistributed == 0) break;
+                        if((offspring2.get(k) - 1) < 0){
+                            continue;
+                        } else {
+                            offspring2.set(k, offspring2.get(k) - 1);
+                            unDistributed -= 1;
+                        }
+                    }
+                }
+            }
+//            System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+            crossoverPopulation.add(offspring1);
+            crossoverPopulation.add(offspring2);
+
+//            System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
 
         }
 
@@ -443,7 +526,7 @@ public class GA implements Comparator<List<List<Integer>>> {
 
     public static List<List<Integer>> mutation(int mutationRate, List<List<Integer>> currentPopulation){
 
-        System.out.println("----------------Mutation------------------");
+//        System.out.println("----------------Mutation------------------");
         List<List<Integer>> mutatedPopulation = new ArrayList<>();
 
         for (int i = 0; i < mutationRate; i++) {
@@ -484,14 +567,13 @@ public class GA implements Comparator<List<List<Integer>>> {
         return mutatedPopulation;
     }
 
-    public static void changingLandscape(int[] idealTaskAllocation){
+    public static int[] changingLandscape(int[] idealTaskAllocation){
 
         //total of ants to be task re-allocated
         originalTaskAlloc = new int[idealTaskAllocation.length];
         originalTaskAlloc = idealTaskAllocation;
         int remainingPopulation = populationSize;
         int rand;
-        int [] temp = new int[idealTaskAllocation.length];
         int[] newTaskAllocation = new int[idealTaskAllocation.length];
 
         do {
@@ -509,13 +591,9 @@ public class GA implements Comparator<List<List<Integer>>> {
             }
         }while (newTaskAllocation.equals(idealTaskAllocation));
 
-        for(int j = 0; j <idealTaskAllocation.length; j++){
-            temp[j] = newTaskAllocation[j];
-            newTaskAllocation[j] = idealTaskAllocation[j];
-            idealTaskAllocation[j] = temp[j];
-        }
+        System.out.println("New ideal task allocation " + newTaskAllocation[0] + " " + newTaskAllocation[1] + " " + newTaskAllocation[2]);
 
-        idealTaskAllocation = newTaskAllocation;
+        return newTaskAllocation;
 
     }
 
@@ -548,27 +626,8 @@ public class GA implements Comparator<List<List<Integer>>> {
         return averageFitness;
     }
 
-    public boolean getIsConverging(){
-        return isConverging;
-    }
-
-    public int getConvergenceValue(){
-        return convergenceValue;
-    }
-
     public int getGenerationLength(){
         return  generationLength;
     }
 
-    public void setIsConverging(boolean converging){
-        isConverging = converging;
-    }
-
-    public boolean getIsSubOptimalConvergence(){
-        return isSubOptimalConvergence;
-    }
-
-    public void setIsSubOptimalConvergence(boolean subOptimalConvergence){
-        isSubOptimalConvergence = subOptimalConvergence;
-    }
 }
