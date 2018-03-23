@@ -44,6 +44,8 @@ public class GA implements Comparator<List<List<Integer>>> {
     static int totalFitnessValue = 0;
     static double averageFitnessValue = 0;
 
+    static boolean isConverging = false;
+    static int convergenceGen;
 
     static int changeGenValue;
 
@@ -51,7 +53,6 @@ public class GA implements Comparator<List<List<Integer>>> {
     //TODO: another crossover
     //TODO: comments
     //TODO: suboptimal values
-    //TODO: generation
 
 
     public GA(int popSize, int tasks,int split, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing, int change, int tournamentSize, boolean sizeRestricted, int generationLength) {
@@ -89,7 +90,9 @@ public class GA implements Comparator<List<List<Integer>>> {
         //initialise
         List<List<Integer>> population = initialise();
 
-//        System.out.println("Population size after init " + population.size());
+//        System.out.println("Population size after init " population.size());
+
+        convergenceGen = 0;
 
         bestFitness = new int[1][generationLength];
         averageFitness = new double[1][generationLength];
@@ -119,7 +122,7 @@ public class GA implements Comparator<List<List<Integer>>> {
             }
 
 
-//            System.out.println("Size of the population after fitness evaluation " + currentFitnessFunction.size());
+//            System.out.println("Size of the population after fitness evaluation " currentFitnessFunction.size());
 
             int[][] tempFitness = new int[currentFitnessFunction.size()][2];
 
@@ -156,13 +159,13 @@ public class GA implements Comparator<List<List<Integer>>> {
                 }.reversed());
             }
 
-//            System.out.println("Size of the population after sorting " + tempFitness.length);
+//            System.out.println("Size of the population after sorting " tempFitness.length);
 
             List<List<Integer>> currentElite = elitism(elitismValue, tempFitness, population);
 
             List<List<Integer>> currentPopulation = tournamentSelection(population, currentFitnessFunction, tournamentSize);
 
-//            System.out.println("Size population after tournament selection " + currentPopulation.size());
+//            System.out.println("Size population after tournament selection " currentPopulation.size());
 
             population.clear();
 
@@ -171,11 +174,29 @@ public class GA implements Comparator<List<List<Integer>>> {
             }
 
 
-//            System.out.println("Size of the population after elitism " + population.size());
+//            System.out.println("Size of the population after elitism " population.size());
 
             bestFitness[0][gen] = tempFitness[0][0];
             averageFitnessValue = totalFitnessValue / currentFitnessFunction.size();
             averageFitness[0][gen] = averageFitnessValue;
+
+            if(!isConverging){
+                if(!isDeceptive){
+                    if(averageFitnessValue - 0 <= 0.000001){
+                        if(!isSizeConstrained){
+                            System.out.println("Unrestricted: " + averageFitnessValue + " gen: " + gen);
+                            isConverging = true;
+                            convergenceGen = gen;
+                        }
+                        else{
+                            System.out.println("Restricted: " + averageFitnessValue + " gen: " + gen);
+                            isConverging = true;
+                            convergenceGen = gen;
+                        }
+
+                    }
+                }
+            }
 
             //crossover
             double crossoverNumber = (currentPopulation.size() - elitismValue - mutationRate) / 2;
@@ -192,7 +213,7 @@ public class GA implements Comparator<List<List<Integer>>> {
                 population.add(curr);
             }
 
-//            System.out.println("Size of the population after crossover " + population.size());
+//            System.out.println("Size of the population after crossover " population.size());
 
             List<List<Integer>> mutatedPopulation = mutation(mutationRate, currentPopulation);
 
@@ -216,7 +237,7 @@ public class GA implements Comparator<List<List<Integer>>> {
             for(int j=0; j< taskNumber; j++){
                 if(j!=taskNumber-1){
                     do {
-                        currentPopulationSize = random.nextInt(populationSize + 1) + 0;
+                        currentPopulationSize = random.nextInt(populationSize + 1);
                     } while (currentPopulationSize > remainingPopulationSize);
                     row.add(currentPopulationSize);
                     remainingPopulationSize-=currentPopulationSize;
@@ -459,8 +480,8 @@ public class GA implements Comparator<List<List<Integer>>> {
                 }
 
             }
-//                        System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-//                        System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+//                        System.out.println("\nOffspring1 " offspring1.get(0) " " offspring1.get(1) " " offspring1.get(2));
+//                        System.out.println("\nOffspring2 " offspring2.get(0) " " offspring2.get(1) " " offspring2.get(2));
             if(errorOffspring1 < 0){
                 int remainder = abs(errorOffspring1);
                 int unDistributed = remainder;
@@ -493,7 +514,7 @@ public class GA implements Comparator<List<List<Integer>>> {
                 while (unDistributed!=0){
                     for(int k = 0; k < taskNumber; k++){
                         if (unDistributed == 0) break;
-                        offspring2.set(k, offspring2.get(k) + 1);
+                        offspring2.set(k, offspring2.get(k)+ 1);
                         unDistributed -= 1;
                     }
                 }
@@ -513,12 +534,53 @@ public class GA implements Comparator<List<List<Integer>>> {
                     }
                 }
             }
-//            System.out.println("\nOffspring1 with constraint " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+//            System.out.println("\nOffspring1 with constraint " offspring1.get(0) " " offspring1.get(1) " " offspring1.get(2));
             crossoverPopulation.add(offspring1);
             crossoverPopulation.add(offspring2);
 
-//            System.out.println("\nOffspring2 with constraint " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+//            System.out.println("\nOffspring2 with constraint " offspring2.get(0) " " offspring2.get(1) " " offspring2.get(2));
 
+        }
+
+        return crossoverPopulation;
+    }
+
+    public static List<List<Integer>> repairConstaintCrossover(double crossoverNum, List<List<Integer>> population){
+        List<List<Integer>> crossoverPopulation = new ArrayList<>();
+
+        //crossover
+        for (int i = 0; i < crossoverNum; i++) {
+
+            do {
+                tempSel1 = random.nextInt(population.size());
+                tempSel2 = random.nextInt(population.size());
+            } while (tempSel1 == tempSel2);
+
+//                System.out.println("Original 1: ");
+//                for (int ki = 0; ki < taskNumber; ki++){
+//                    System.out.println(currentPopulation.get(tempSel1).get(ki));
+//                }
+//
+//                System.out.println("Original 2: ");
+//                for (int fi = 0; fi < taskNumber; fi++){
+//                    System.out.println(currentPopulation.get(tempSel2).get(fi));
+//                }
+
+            List<Integer> offspring1 = new ArrayList<>();
+            List<Integer> offspring2 = new ArrayList<>();
+
+            for (int j = 0; j < taskNumber; j++) {
+                if (j >= split) {
+                    offspring1.add(population.get(tempSel2).get(j));
+                    offspring2.add(population.get(tempSel1).get(j));
+                } else {
+                    offspring1.add(population.get(tempSel1).get(j));
+                    offspring2.add(population.get(tempSel2).get(j));
+                }
+            }
+
+            crossoverPopulation.add(offspring1);
+            crossoverPopulation.add(offspring2);
         }
 
         return crossoverPopulation;
@@ -533,7 +595,7 @@ public class GA implements Comparator<List<List<Integer>>> {
 
             int check;
             do {
-//                    System.out.println("Current population: " + currentPopulation.size());
+//                    System.out.println("Current population: " currentPopulation.size());
                 mutateChromosome = random.nextInt(currentPopulation.size());
                 mutateTask = random.nextInt(taskNumber);
                 mutatedTask = random.nextInt(taskNumber);
@@ -561,7 +623,7 @@ public class GA implements Comparator<List<List<Integer>>> {
 //                }
             mutatedPopulation.add(mutatedGene);
 
-//                System.out.println("Size of the population after mutation " + population.size());
+//                System.out.println("Size of the population after mutation " population.size());
         }
 
         return mutatedPopulation;
@@ -591,7 +653,7 @@ public class GA implements Comparator<List<List<Integer>>> {
             }
         }while (newTaskAllocation.equals(idealTaskAllocation));
 
-        System.out.println("New ideal task allocation " + newTaskAllocation[0] + " " + newTaskAllocation[1] + " " + newTaskAllocation[2]);
+//        System.out.println("New ideal task allocation " + newTaskAllocation[0] + " " + newTaskAllocation[1] + " " + newTaskAllocation[2]);
 
         return newTaskAllocation;
 
@@ -628,6 +690,18 @@ public class GA implements Comparator<List<List<Integer>>> {
 
     public int getGenerationLength(){
         return  generationLength;
+    }
+
+    public boolean getIsConverging(){
+        return isConverging;
+    }
+
+    public int getConvergenceValue(){
+        return convergenceGen;
+    }
+
+    public void setIsConverging(boolean bool){
+        this.isConverging = bool;
     }
 
 }
