@@ -32,6 +32,7 @@ public class mainGA {
 
     //TODO: new way to call functions
     //TODO: save t file
+    //TODO: new graphs
     public static void main (String args[]){
 
         run = 1;
@@ -39,7 +40,7 @@ public class mainGA {
         totalConvergence = 0;
         totalConvergence2 = 0;
 
-        while (run <=2){
+        while (run <=5){
 
             System.out.println(run);
             System.out.println("----------------------------------------");
@@ -47,7 +48,7 @@ public class mainGA {
 
 
             int[] idealTaskRun1 = new int[] {100,100,100};
-            GA run1 = new GA(300, 3, 2, idealTaskRun1, 100, 20, 10, 0, false, false, 0, 2, true, 1000);
+            GA run1 = new GA(300, 3, 2, idealTaskRun1, 100, 20, 10, 0, true, true, 0, 2, true, 1000);
             int [][] bestUnimodalFitness = run1.getBestFitness();
             double [] [] averageUnimodalFitness = run1.getAverageFitness();
             generationLength = run1.getGenerationLength();
@@ -65,7 +66,7 @@ public class mainGA {
             chart.setVisible( true );
 
             int[] idealTaskRun5 = new int[] {100,100,100};
-            GA run5 = new GA(300, 3, 2, idealTaskRun5, 1000, 20, 10, 400, false, false, 10, 2, false, 1000);
+            GA run5 = new GA(300, 3, 2, idealTaskRun5, 1000, 20, 10, 400, true, true, 10, 2, false, 1000);
             int [][] bestunconstrainedUnimodalFitness = run5.getBestFitness();
             double [][] averageunconstrainedUnimodalFitness = run5.getAverageFitness();
             generationLength = run5.getGenerationLength();
@@ -196,11 +197,11 @@ class XYLineChart_AWT extends ApplicationFrame {
         final XYPlot plot = xylineChart.getXYPlot( );
 
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer( );
-        renderer.setSeriesPaint( 0 , Color.GREEN);
-        renderer.setSeriesPaint( 1 , Color.RED);
+        renderer.setSeriesPaint( 1 , Color.GREEN);
+        renderer.setSeriesPaint( 1 , Color.BLUE);
         //renderer.setSeriesPaint( 2 , Color.YELLOW );
-        renderer.setSeriesStroke( 0 , new BasicStroke( 3.0f ) );
-        renderer.setSeriesStroke( 1 , new BasicStroke( 3.0f ) );
+        renderer.setSeriesStroke( 1 , new BasicStroke());
+        renderer.setSeriesStroke( 1 , new BasicStroke());
         //renderer.setSeriesStroke( 2 , new BasicStroke( 2.0f ) );
         plot.setRenderer( renderer );
         setContentPane( chartPanel );

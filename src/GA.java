@@ -49,7 +49,6 @@ public class GA implements Comparator<List<List<Integer>>> {
 
     static int changeGenValue;
 
-    //TODO: convergence values
     //TODO: another crossover
     //TODO: comments
     //TODO: suboptimal values
@@ -204,7 +203,7 @@ public class GA implements Comparator<List<List<Integer>>> {
 //            System.out.println(crossoverNumber);
 
             if(isSizeConstrained){
-                crossoverPopulation = averageConstraintCrossover(crossoverNumber, currentPopulation);
+                crossoverPopulation = repairConstaintCrossover(crossoverNumber, currentPopulation);
             }else crossoverPopulation = unConstrainedCrosover(crossoverNumber, currentPopulation);
 
 
@@ -556,27 +555,118 @@ public class GA implements Comparator<List<List<Integer>>> {
                 tempSel2 = random.nextInt(population.size());
             } while (tempSel1 == tempSel2);
 
-//                System.out.println("Original 1: ");
-//                for (int ki = 0; ki < taskNumber; ki++){
-//                    System.out.println(currentPopulation.get(tempSel1).get(ki));
-//                }
-//
-//                System.out.println("Original 2: ");
-//                for (int fi = 0; fi < taskNumber; fi++){
-//                    System.out.println(currentPopulation.get(tempSel2).get(fi));
-//                }
+                System.out.println("Original 1: ");
+                for (int ki = 0; ki < taskNumber; ki++){
+                    System.out.println(population.get(tempSel1).get(ki));
+                }
+
+                System.out.println("Original 2: ");
+                for (int fi = 0; fi < taskNumber; fi++){
+                    System.out.println(population.get(tempSel2).get(fi));
+                }
 
             List<Integer> offspring1 = new ArrayList<>();
             List<Integer> offspring2 = new ArrayList<>();
+            errorOffspring1 = 0;
+            errorOffspring2 = 0;
 
             for (int j = 0; j < taskNumber; j++) {
                 if (j >= split) {
                     offspring1.add(population.get(tempSel2).get(j));
                     offspring2.add(population.get(tempSel1).get(j));
+                    errorOffspring1 +=  offspring1.get(j) - population.get(tempSel1).get(j);
+                    errorOffspring2 += offspring2.get(j) - population.get(tempSel2).get(j);
                 } else {
                     offspring1.add(population.get(tempSel1).get(j));
                     offspring2.add(population.get(tempSel2).get(j));
                 }
+            }
+
+            System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+            System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+
+            if(errorOffspring1 > 0){
+                int unDistributed = errorOffspring1;
+                int diff;
+                do{
+                    int select = random.nextInt(taskNumber);
+                    diff = offspring1.get(select) - unDistributed;
+
+                    if(diff <=  -1){
+                        unDistributed -= offspring1.get(select);
+                        offspring1.set(select, 0);
+
+                        int selectTemp;
+
+                        do{
+                            selectTemp = random.nextInt(taskNumber);
+                            diff = offspring1.get(selectTemp) - unDistributed;
+
+                        } while (select == selectTemp || diff <= -1);
+
+                        offspring1.set(selectTemp, diff);
+                        unDistributed -= unDistributed;
+
+                    }
+                    else {
+                        offspring1.set(select, diff);
+                        unDistributed -= unDistributed;
+                    }
+                } while( unDistributed > 0);
+            }
+
+            if(errorOffspring2 > 0){
+                int unDistributed = errorOffspring2;
+                int diff;
+                do{
+                    int select = random.nextInt(taskNumber);
+                    diff = offspring2.get(select) - unDistributed;
+
+                    if(diff <=  -1){
+                        unDistributed -= offspring2.get(select);
+                        offspring2.set(select, 0);
+
+                        int selectTemp;
+
+                        do{
+                            selectTemp = random.nextInt(taskNumber);
+                            diff = offspring2.get(selectTemp) - unDistributed;
+
+                        } while (select == selectTemp || diff <= -1);
+
+                        offspring2.set(selectTemp, diff);
+                        unDistributed -= unDistributed;
+
+                    }
+                    else{
+                        offspring2.set(select, diff);
+                        unDistributed -= unDistributed;
+                    }
+
+                } while( unDistributed > 0);
+            }
+
+            if(errorOffspring1 < 0){
+                int select = random.nextInt(taskNumber);
+                offspring1.set(select, offspring1.get(select) + abs(errorOffspring1));
+            }
+
+            if(errorOffspring2 < 0){
+                int select = random.nextInt(taskNumber);
+                offspring2.set(select, offspring2.get(select) + abs(errorOffspring2));
+            }
+
+            System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
+            System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+
+            int size = (offspring1.get(0) + offspring1.get(1) + offspring1.get(2));
+            if(size != populationSize){
+                System.out.println("Size does no equal to popSize" + size);
+            }
+
+            int size2 = (offspring2.get(0) + offspring2.get(1) + offspring2.get(2));
+            if(size != populationSize){
+                System.out.println("Size does no equal to popSize" + size);
             }
 
             crossoverPopulation.add(offspring1);
