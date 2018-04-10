@@ -76,6 +76,7 @@ public class mainGA {
                 totalConvergence2 += run5.getConvergenceValue();
                 convergentRuns2++;
                 run5.setIsConverging(false);
+
             }
 
             XYLineChart_AWT chart5 = new XYLineChart_AWT("Fitness unConstrained Unimodal Function",

@@ -48,12 +48,9 @@ public class GA implements Comparator<List<List<Integer>>> {
     static boolean isConverging = false;
     static int convergenceGen;
 
+    static boolean isEliteReplaced = false;
+
     static int changeGenValue;
-
-    //TODO: another crossover
-    //TODO: comments
-    //TODO: suboptimal values
-
 
     public GA(int popSize, int tasks,int split, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing, int change, int tournamentSize, boolean sizeRestricted, int generationLength) {
         this.populationSize = popSize;
@@ -88,14 +85,15 @@ public class GA implements Comparator<List<List<Integer>>> {
     public static void start() {
 
         //initialise
-        List<List<Integer>> population = initialise();
-
+        List<List<Integer>> population = initialise(chromosomeSize);
 //        System.out.println("Population size after init " population.size());
+
 
         convergenceGen = 0;
 
         bestFitness = new int[1][generationLength];
         averageFitness = new double[1][generationLength];
+        isEliteReplaced = false;
 
         //iterate for several iterations
         for (int gen = 0; gen < generationLength; gen++) {
@@ -161,6 +159,7 @@ public class GA implements Comparator<List<List<Integer>>> {
 
 //            System.out.println("Size of the population after sorting " tempFitness.length);
 
+
             List<List<Integer>> currentElite = elitism(elitismValue, tempFitness, population);
 
             List<List<Integer>> currentPopulation = tournamentSelection(population, currentFitnessFunction, tournamentSize);
@@ -168,11 +167,6 @@ public class GA implements Comparator<List<List<Integer>>> {
 //            System.out.println("Size population after tournament selection " currentPopulation.size());
 
             population.clear();
-
-            for(List<Integer> curr : currentElite){
-                population.add(curr);
-            }
-
 
 //            System.out.println("Size of the population after elitism " population.size());
 
@@ -197,6 +191,16 @@ public class GA implements Comparator<List<List<Integer>>> {
                     }
                 }
             }
+
+            if(isConverging && !isEliteReplaced){
+                currentElite = eraseTopAfterElitism(elitismValue);
+                isEliteReplaced = true;
+            }
+
+            for(List<Integer> curr : currentElite){
+                population.add(curr);
+            }
+
 
             //crossover
             double crossoverNumber = (currentPopulation.size() - elitismValue - mutationRate) / 2;
@@ -228,7 +232,7 @@ public class GA implements Comparator<List<List<Integer>>> {
         }
     }
 
-    public static List<List<Integer>> initialise(){
+    public static List<List<Integer>> initialise(int chromosomeSize){
         List<List<Integer>> population = new ArrayList<>();
 
         for(int i=0; i<chromosomeSize; i++){
@@ -324,8 +328,8 @@ public class GA implements Comparator<List<List<Integer>>> {
         return fitnessFunction;
     }
 
-    public static List<List<Integer>> eraseTopAfterElitism(int eliteValue, List<List<Integer>> currentPopulation){
-        List<List<Integer>> newPopulation = new ArrayList<>();
+    public static List<List<Integer>> eraseTopAfterElitism(int eliteValue){
+        List<List<Integer>> newPopulation = initialise(eliteValue);
 
         return newPopulation;
     }
