@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.Math.abs;
 
@@ -203,8 +204,8 @@ public class GA implements Comparator<List<List<Integer>>> {
 //            System.out.println(crossoverNumber);
 
             if(isSizeConstrained){
-                crossoverPopulation = repairConstaintCrossover(crossoverNumber, currentPopulation);
-            }else crossoverPopulation = unConstrainedCrosover(crossoverNumber, currentPopulation);
+                crossoverPopulation = averageConstraintCrossover(crossoverNumber, currentPopulation);
+            }else crossoverPopulation = unConstrainedCrossover(crossoverNumber, currentPopulation);
 
 
 
@@ -214,7 +215,7 @@ public class GA implements Comparator<List<List<Integer>>> {
 
 //            System.out.println("Size of the population after crossover " population.size());
 
-            List<List<Integer>> mutatedPopulation = mutation(mutationRate, currentPopulation);
+            List<List<Integer>> mutatedPopulation = mutationConstrained(mutationRate, currentPopulation);
 
             for(List<Integer> curr : mutatedPopulation){
                 population.add(curr);
@@ -394,7 +395,7 @@ public class GA implements Comparator<List<List<Integer>>> {
         return currentPopulation;
     }
 
-    public static List<List<Integer>> unConstrainedCrosover(double crossoverNum, List<List<Integer>> currentPopulation) {
+    public static List<List<Integer>> unConstrainedCrossover(double crossoverNum, List<List<Integer>> currentPopulation) {
         List<List<Integer>> crossoverPopulation = new ArrayList<>();
 
 //        System.out.println("---------------------Crossover--------------------------");
@@ -533,6 +534,18 @@ public class GA implements Comparator<List<List<Integer>>> {
                     }
                 }
             }
+
+            int size1 = 0;
+            int size2 = 0;
+            for(int check = 0; check < taskNumber; check++){
+                size1 +=offspring1.get(check);
+                size2 +=offspring2.get(check);
+            }
+
+            if(size1 != populationSize || size2 != populationSize){
+                System.out.println("Size wrong");
+            }
+
 //            System.out.println("\nOffspring1 with constraint " offspring1.get(0) " " offspring1.get(1) " " offspring1.get(2));
             crossoverPopulation.add(offspring1);
             crossoverPopulation.add(offspring2);
@@ -544,7 +557,7 @@ public class GA implements Comparator<List<List<Integer>>> {
         return crossoverPopulation;
     }
 
-    public static List<List<Integer>> repairConstaintCrossover(double crossoverNum, List<List<Integer>> population){
+    public static List<List<Integer>> repairConstraintCrossover(double crossoverNum, List<List<Integer>> population){
         List<List<Integer>> crossoverPopulation = new ArrayList<>();
 
         //crossover
@@ -555,15 +568,15 @@ public class GA implements Comparator<List<List<Integer>>> {
                 tempSel2 = random.nextInt(population.size());
             } while (tempSel1 == tempSel2);
 
-                System.out.println("Original 1: ");
-                for (int ki = 0; ki < taskNumber; ki++){
-                    System.out.println(population.get(tempSel1).get(ki));
-                }
-
-                System.out.println("Original 2: ");
-                for (int fi = 0; fi < taskNumber; fi++){
-                    System.out.println(population.get(tempSel2).get(fi));
-                }
+//                System.out.println("Original 1: ");
+//                for (int ki = 0; ki < taskNumber; ki++){
+//                    System.out.println(population.get(tempSel1).get(ki));
+//                }
+//
+//                System.out.println("Original 2: ");
+//                for (int fi = 0; fi < taskNumber; fi++){
+//                    System.out.println(population.get(tempSel2).get(fi));
+//                }
 
             List<Integer> offspring1 = new ArrayList<>();
             List<Integer> offspring2 = new ArrayList<>();
@@ -582,14 +595,18 @@ public class GA implements Comparator<List<List<Integer>>> {
                 }
             }
 
-            System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-            System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+//            System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2) + " " + offspring1.get(3));
+//            System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2) + " " + offspring2.get(3));
 
             if(errorOffspring1 > 0){
                 int unDistributed = errorOffspring1;
                 int diff;
+
                 do{
-                    int select = random.nextInt(taskNumber);
+                    int select;
+                    do{
+                        select = random.nextInt(taskNumber);
+                    } while (select >= split);
                     diff = offspring1.get(select) - unDistributed;
 
                     if(diff <=  -1){
@@ -608,18 +625,23 @@ public class GA implements Comparator<List<List<Integer>>> {
                         unDistributed -= unDistributed;
 
                     }
-                    else {
+                    else{
                         offspring1.set(select, diff);
                         unDistributed -= unDistributed;
                     }
+
                 } while( unDistributed > 0);
             }
 
             if(errorOffspring2 > 0){
                 int unDistributed = errorOffspring2;
                 int diff;
+
                 do{
-                    int select = random.nextInt(taskNumber);
+                    int select;
+                    do{
+                        select = random.nextInt(taskNumber);
+                    } while (select >= split);
                     diff = offspring2.get(select) - unDistributed;
 
                     if(diff <=  -1){
@@ -656,17 +678,18 @@ public class GA implements Comparator<List<List<Integer>>> {
                 offspring2.set(select, offspring2.get(select) + abs(errorOffspring2));
             }
 
-            System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2));
-            System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2));
+//            System.out.println("\nOffspring1 " + offspring1.get(0) + " " + offspring1.get(1) + " " + offspring1.get(2) + offspring1.get(3));
+//            System.out.println("\nOffspring2 " + offspring2.get(0) + " " + offspring2.get(1) + " " + offspring2.get(2) + offspring1.get(3));
 
-            int size = (offspring1.get(0) + offspring1.get(1) + offspring1.get(2));
-            if(size != populationSize){
-                System.out.println("Size does no equal to popSize" + size);
+            int size1 = 0;
+            int size2 = 0;
+            for(int check = 0; check < taskNumber; check++){
+                size1 +=offspring1.get(check);
+                size2 +=offspring2.get(check);
             }
 
-            int size2 = (offspring2.get(0) + offspring2.get(1) + offspring2.get(2));
-            if(size != populationSize){
-                System.out.println("Size does no equal to popSize" + size);
+            if(size1 != populationSize || size2 != populationSize){
+                System.out.println("Size wrong");
             }
 
             crossoverPopulation.add(offspring1);
@@ -714,6 +737,119 @@ public class GA implements Comparator<List<List<Integer>>> {
             mutatedPopulation.add(mutatedGene);
 
 //                System.out.println("Size of the population after mutation " population.size());
+        }
+
+        return mutatedPopulation;
+    }
+
+    public static List<List<Integer>> mutationConstrained(int mutationRate, List<List<Integer>> currentPopulation){
+
+        List<List<Integer>> mutatedPopulation = new ArrayList<>();
+
+        for (int i = 0; i< mutationRate; i++){
+
+            System.out.println("Round: " + i);
+
+            List<Integer> toMutate = new ArrayList<>();
+//            int max = 0;
+            int totalPop = 0;
+            int value = 0;
+            int diff = 0;
+            int mutatedGene = random.nextInt(taskNumber);
+            int mutatedChromosome = random.nextInt(populationSize);
+
+            System.out.println("OG");
+            for(int j = 0; j <taskNumber; j++){
+                System.out.println(currentPopulation.get(mutatedChromosome).get(j));
+                toMutate.add(currentPopulation.get(mutatedChromosome).get(j));
+            }
+
+            int oldValue = currentPopulation.get(mutatedChromosome).get(mutatedGene);
+
+            for(int check = 0; check < taskNumber; check++){
+                if (check != mutatedGene){
+                    totalPop+=currentPopulation.get(mutatedChromosome).get(check);
+//                    if(currentPopulation.get(mutatedChromosome).get(check) > max){
+//                        max = currentPopulation.get(mutatedChromosome).get(check);
+//                    }
+                }
+            }
+             int min = ((oldValue - totalPop) <= -1) ? 0 : oldValue - totalPop;
+            do{
+
+                value = ThreadLocalRandom.current().nextInt(min, populationSize + 1);
+
+            }while (value == oldValue);
+
+            diff = value - oldValue;
+
+            int unDistributed = diff;
+
+            if(diff < 0){
+                int constrainedGene = 0;
+                do{
+                    constrainedGene = random.nextInt(taskNumber);
+                }while (mutatedGene == constrainedGene);
+
+                for(int j =0; j < taskNumber; j++){
+                    if(j == mutatedGene){
+                        toMutate.set(j, value);
+                    }
+                    if(j == constrainedGene){
+                        int newGene = currentPopulation.get(mutatedChromosome).get(j) + abs(diff);
+//                        System.out.println(currentPopulation.get(mutatedChromosome).get(j));
+//                        System.out.println(abs(diff));
+//                        System.out.println(newGene);
+                        toMutate.set(j, toMutate.get(j) + abs(diff));
+                    }
+                    else {
+                        continue;
+                    }
+                }
+                unDistributed = 0;
+            }
+
+            if(diff > 0){
+
+                do{
+                    int select;
+                    int zeroCheck;
+                    do{
+                        select = random.nextInt(taskNumber);
+                        zeroCheck = toMutate.get(select);
+
+                    } while ((select == mutatedGene) || zeroCheck == 0);
+
+                    for(int j =0; j < taskNumber; j++) {
+                        if (j == mutatedGene) {
+                            toMutate.set(j, value);
+                        }
+                        if (j == select && unDistributed > 0) {
+
+                            int newGene = toMutate.get(j) - unDistributed;
+                            if(newGene < 0){
+                                toMutate.set(j, 0);
+                                unDistributed -= currentPopulation.get(mutatedChromosome).get(j);
+                            }else{
+                                toMutate.set(j,newGene);
+                                unDistributed = 0;
+                            }
+
+                        } else {
+                            continue;
+                        }
+                    }
+                }while (unDistributed > 1);
+
+            }
+
+            System.out.println("New");
+             for (int x = 0; x < taskNumber; x++){
+                System.out.println(toMutate.get(x));
+            }
+
+            mutatedPopulation.add(toMutate);
+
         }
 
         return mutatedPopulation;

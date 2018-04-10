@@ -46,27 +46,30 @@ public class mainGA {
             System.out.println("----------------------------------------");
             maxRuns=run;
 
+//            System.out.println("Run 1");
+//
+//            int[] idealTaskRun1 = new int[] {10,10,10, 10};
+//            GA run1 = new GA(40, 4, 2, idealTaskRun1, 100, 20, 10, 0, false, true, 0, 2, true, 1000);
+//            int [][] bestUnimodalFitness = run1.getBestFitness();
+//            double [] [] averageUnimodalFitness = run1.getAverageFitness();
+//            generationLength = run1.getGenerationLength();
+//
+//            if(run1.getIsConverging()){
+//                totalConvergence += run1.getConvergenceValue();
+//                convergentRuns++;
+//                run1.setIsConverging(false);
+//            }
+//
+//            XYLineChart_AWT chart = new XYLineChart_AWT("Fitness Unimodal Function",
+//                    "Fitness Unimodal Function Run " + run, bestUnimodalFitness, averageUnimodalFitness, generationLength);
+//            chart.pack( );
+//            RefineryUtilities.centerFrameOnScreen( chart );
+//            chart.setVisible( true );
 
-            int[] idealTaskRun1 = new int[] {100,100,100};
-            GA run1 = new GA(300, 3, 2, idealTaskRun1, 100, 20, 10, 0, true, true, 0, 2, true, 1000);
-            int [][] bestUnimodalFitness = run1.getBestFitness();
-            double [] [] averageUnimodalFitness = run1.getAverageFitness();
-            generationLength = run1.getGenerationLength();
-
-            if(run1.getIsConverging()){
-                totalConvergence += run1.getConvergenceValue();
-                convergentRuns++;
-                run1.setIsConverging(false);
-            }
-
-            XYLineChart_AWT chart = new XYLineChart_AWT("Fitness Unimodal Function",
-                    "Fitness Unimodal Function Run " + run, bestUnimodalFitness, averageUnimodalFitness, generationLength);
-            chart.pack( );
-            RefineryUtilities.centerFrameOnScreen( chart );
-            chart.setVisible( true );
+            System.out.println("Run 2");
 
             int[] idealTaskRun5 = new int[] {100,100,100};
-            GA run5 = new GA(300, 3, 2, idealTaskRun5, 1000, 20, 10, 400, true, true, 10, 2, false, 1000);
+            GA run5 = new GA(300, 3, 2, idealTaskRun5, 1000, 20, 10, 400, false, true, 10, 2, true, 1000);
             int [][] bestunconstrainedUnimodalFitness = run5.getBestFitness();
             double [][] averageunconstrainedUnimodalFitness = run5.getAverageFitness();
             generationLength = run5.getGenerationLength();
