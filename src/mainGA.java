@@ -66,8 +66,6 @@ public class mainGA {
 //            RefineryUtilities.centerFrameOnScreen( chart );
 //            chart.setVisible( true );
 
-            System.out.println("Run 2");
-
             int[] idealTaskRun5 = new int[] {100,100,100};
             GA run5 = new GA(300, 3, 2, idealTaskRun5, 1000, 20, 10, 400, false, true, 10, 2, true, 1000);
             int [][] bestunconstrainedUnimodalFitness = run5.getBestFitness();

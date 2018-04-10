@@ -324,6 +324,12 @@ public class GA implements Comparator<List<List<Integer>>> {
         return fitnessFunction;
     }
 
+    public static List<List<Integer>> eraseTopAfterElitism(int eliteValue, List<List<Integer>> currentPopulation){
+        List<List<Integer>> newPopulation = new ArrayList<>();
+
+        return newPopulation;
+    }
+
     public static List<List<Integer>> elitism(int elitismValue, int[][] temp, List<List<Integer>> currentPopulation){
 
 //        System.out.println("-------------------Elitism-----------------");
@@ -748,19 +754,16 @@ public class GA implements Comparator<List<List<Integer>>> {
 
         for (int i = 0; i< mutationRate; i++){
 
-            System.out.println("Round: " + i);
-
             List<Integer> toMutate = new ArrayList<>();
-//            int max = 0;
             int totalPop = 0;
             int value = 0;
             int diff = 0;
             int mutatedGene = random.nextInt(taskNumber);
             int mutatedChromosome = random.nextInt(populationSize);
-
-            System.out.println("OG");
+//
+//            System.out.println("OG");
             for(int j = 0; j <taskNumber; j++){
-                System.out.println(currentPopulation.get(mutatedChromosome).get(j));
+//                System.out.println(currentPopulation.get(mutatedChromosome).get(j));
                 toMutate.add(currentPopulation.get(mutatedChromosome).get(j));
             }
 
@@ -769,9 +772,6 @@ public class GA implements Comparator<List<List<Integer>>> {
             for(int check = 0; check < taskNumber; check++){
                 if (check != mutatedGene){
                     totalPop+=currentPopulation.get(mutatedChromosome).get(check);
-//                    if(currentPopulation.get(mutatedChromosome).get(check) > max){
-//                        max = currentPopulation.get(mutatedChromosome).get(check);
-//                    }
                 }
             }
              int min = ((oldValue - totalPop) <= -1) ? 0 : oldValue - totalPop;
@@ -791,15 +791,11 @@ public class GA implements Comparator<List<List<Integer>>> {
                     constrainedGene = random.nextInt(taskNumber);
                 }while (mutatedGene == constrainedGene);
 
-                for(int j =0; j < taskNumber; j++){
+                for(int j = 0; j < taskNumber; j++){
                     if(j == mutatedGene){
                         toMutate.set(j, value);
                     }
                     if(j == constrainedGene){
-                        int newGene = currentPopulation.get(mutatedChromosome).get(j) + abs(diff);
-//                        System.out.println(currentPopulation.get(mutatedChromosome).get(j));
-//                        System.out.println(abs(diff));
-//                        System.out.println(newGene);
                         toMutate.set(j, toMutate.get(j) + abs(diff));
                     }
                     else {
@@ -807,10 +803,18 @@ public class GA implements Comparator<List<List<Integer>>> {
                     }
                 }
                 unDistributed = 0;
+
+                int sizeCheck = 0;
+
+                for( int c = 0; c < taskNumber; c++){
+                    sizeCheck += toMutate.get(c);
+                }
+                if(sizeCheck != populationSize){
+                    System.out.println(sizeCheck + " doesn't go in the range");
+                }
             }
 
             if(diff > 0){
-
                 do{
                     int select;
                     int zeroCheck;
@@ -839,14 +843,23 @@ public class GA implements Comparator<List<List<Integer>>> {
                             continue;
                         }
                     }
-                }while (unDistributed > 1);
+                }while (unDistributed > 0);
+
+                int sizeCheck = 0;
+
+                for( int c = 0; c < taskNumber; c++){
+                    sizeCheck += toMutate.get(c);
+                }
+                if(sizeCheck != populationSize){
+                    System.out.println(sizeCheck + " doesn't go in the range");
+                }
 
             }
 
-            System.out.println("New");
-             for (int x = 0; x < taskNumber; x++){
-                System.out.println(toMutate.get(x));
-            }
+//            System.out.println("New");
+//             for (int x = 0; x < taskNumber; x++){
+//                System.out.println(toMutate.get(x));
+//            }
 
             mutatedPopulation.add(toMutate);
 
