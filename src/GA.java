@@ -822,9 +822,12 @@ public class GA implements Comparator<List<List<Integer>>> {
                     totalPop+=currentPopulation.get(mutatedChromosome).get(check);
                 }
             }
-             int min = ((oldValue - totalPop) <= -1) ? 0 : oldValue - totalPop;
-            do{
+            int min = 0;
+            if(oldValue == populationSize){
+                min = 0;
+            }else min = ((oldValue - totalPop) <= -1) ? 0 : oldValue - totalPop;
 
+            do{
                 value = ThreadLocalRandom.current().nextInt(min, populationSize);
 
             }while (value == oldValue);
