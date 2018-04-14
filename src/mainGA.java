@@ -104,7 +104,7 @@ public class mainGA {
             }
 
             //int[] idealTaskRun2 = new int[] {75,75,75,75};
-            GA run2 = new GA(300, 3, 2, idealTaskRun1, 1000, 20, 10, 0, false, false, 0, 50, true, generationLength);
+            GA run2 = new GA(300, 4, 2, idealTaskRun1, 1000, 20, 10, 0, false, false, 0, 50, true, generationLength);
             int [] bestFitnessrun2 = run2.getBestFitness();
             double [] averageFitnessrun2 = run2.getAverageFitness();
 
