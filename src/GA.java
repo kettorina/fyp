@@ -52,7 +52,9 @@ public class GA implements Comparator<List<List<Integer>>> {
 
     static int changeGenValue;
 
-    public GA(int popSize, int tasks,int split, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing, int change, int tournamentSize, boolean sizeRestricted, int generationLength) {
+    static boolean choice;
+
+    public GA(int popSize, int tasks,int split, int[] taskAllocation, int solutions, int elite, int mutation, int maxFitness, boolean deceptive, boolean changing, int change, int tournamentSize, boolean sizeRestricted, int generationLength, boolean ch) {
         this.populationSize = popSize;
         this.taskNumber = tasks;
         this.split = split;
@@ -66,6 +68,8 @@ public class GA implements Comparator<List<List<Integer>>> {
         this.isSizeConstrained = sizeRestricted;
 
         this.generationLength = generationLength;
+
+        this.choice = ch;
 
 //        this.subOptimal = calculateSubOptimalSolution(idealTaskAllocation, popSize);
 
@@ -204,7 +208,11 @@ public class GA implements Comparator<List<List<Integer>>> {
 //            System.out.println(crossoverNumber);
 
             if(isSizeConstrained){
-                crossoverPopulation = repairConstraintCrossover(crossoverNumber, currentPopulation);
+                if(!choice){
+                    crossoverPopulation = repairConstraintCrossover(crossoverNumber, currentPopulation);
+                }else{
+                    crossoverPopulation = averageConstraintCrossover(crossoverNumber, currentPopulation);
+                }
             }else crossoverPopulation = unConstrainedCrossover(crossoverNumber, currentPopulation);
 
 

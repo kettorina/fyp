@@ -87,41 +87,41 @@ public class mainGA {
             maxRuns=run;
 
 
-//            int[] idealTaskRun1 = new int[] {100,100,100};
-//            GA run1 = new GA(300, 3, 2, idealTaskRun1, 1000, 20, 10, 0, false, false, 0, 50, true, generationLength);
-//            int [] bestFitnessrun1 = run1.getBestFitness();
-//            double [] averageFitness1 = run1.getAverageFitness();
-//
-//            for(int i = 0; i < generationLength; i++){
-//                totalBestrun1[i] += bestFitnessrun1[i];
-//                totalAveragerun1[i] += averageFitness1[i];
-//            }
-//
-//            if(run1.getIsConverging()){
-//                totalConvergencerun1 += run1.getConvergenceValue();
-//                convergentRuns1++;
-//                run1.setIsConverging(false);
-//            }
-//
-//            //int[] idealTaskRun2 = new int[] {75,75,75,75};
-//            GA run2 = new GA(300, 3, 2, idealTaskRun1, 1000, 20, 10, 200, true, false, 0, 50, true, generationLength);
-//            int [] bestFitnessrun2 = run2.getBestFitness();
-//            double [] averageFitnessrun2 = run2.getAverageFitness();
-//
-//            for(int i = 0; i < generationLength; i++){
-//                totalBestrun2[i] += bestFitnessrun2[i];
-//                totalAveragerun2[i] += averageFitnessrun2[i];
-//            }
-//
-//            if(run2.getIsConverging()){
-//                totalConvergencerun2 += run2.getConvergenceValue();
-//                convergentRuns2++;
-//                run2.setIsConverging(false);
-//            }
+            int[] idealTaskRun1 = new int[] {100,100,100};
+            GA run1 = new GA(300, 3, 2, idealTaskRun1, 1000, 20, 10, 0, false, false, 0, 50, true, generationLength, false);
+            int [] bestFitnessrun1 = run1.getBestFitness();
+            double [] averageFitness1 = run1.getAverageFitness();
+
+            for(int i = 0; i < generationLength; i++){
+                totalBestrun1[i] += bestFitnessrun1[i];
+                totalAveragerun1[i] += averageFitness1[i];
+            }
+
+            if(run1.getIsConverging()){
+                totalConvergencerun1 += run1.getConvergenceValue();
+                convergentRuns1++;
+                run1.setIsConverging(false);
+            }
+
+            //int[] idealTaskRun2 = new int[] {75,75,75,75};
+            GA run2 = new GA(300, 3, 2, idealTaskRun1, 1000, 20, 10, 0, true, false, 0, 50, true, generationLength, false);
+            int [] bestFitnessrun2 = run2.getBestFitness();
+            double [] averageFitnessrun2 = run2.getAverageFitness();
+
+            for(int i = 0; i < generationLength; i++){
+                totalBestrun2[i] += bestFitnessrun2[i];
+                totalAveragerun2[i] += averageFitnessrun2[i];
+            }
+
+            if(run2.getIsConverging()){
+                totalConvergencerun2 += run2.getConvergenceValue();
+                convergentRuns2++;
+                run2.setIsConverging(false);
+            }
 
 
             int[] idealTaskRun3 = new int[] {100,100,100};
-            GA run3 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 0, false, true, 0, 50, true, generationLength);
+            GA run3 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 200, false, false, 0, 50, true, generationLength, true);
             int [] bestFitnessrun3 = run3.getBestFitness();
             double [] averageFitnessrun3 = run3.getAverageFitness();
 
@@ -137,7 +137,7 @@ public class mainGA {
             }
 
 
-            GA run4 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 200, true, true, 0, 50, true, generationLength);
+            GA run4 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 200, true, false, 0, 50, true, generationLength, true);
             int [] bestFitnessrun4 = run4.getBestFitness();
             double [] averageFitnessrun4 = run4.getAverageFitness();
 
@@ -156,30 +156,30 @@ public class mainGA {
         }
 
         for(int j = 0; j < generationLength; j++){
-//            averageBestrun1[j] = (double) totalBestrun1[j] / (double) maxRuns;
-//            averageAveragerun1[j] =  totalAveragerun1[j] / (double) maxRuns;
-//            averageBestrun2[j] = (double) totalBestrun2[j] / (double) maxRuns;
-//            averageAveragerun2[j] =  totalAveragerun2[j] / (double) maxRuns;
+            averageBestrun1[j] = (double) totalBestrun1[j] / (double) maxRuns;
+            averageAveragerun1[j] =  totalAveragerun1[j] / (double) maxRuns;
+            averageBestrun2[j] = (double) totalBestrun2[j] / (double) maxRuns;
+            averageAveragerun2[j] =  totalAveragerun2[j] / (double) maxRuns;
             averageBestrun3[j] = (double) totalBestrun3[j] / (double) maxRuns;
             averageAveragerun3[j] =  totalAveragerun3[j] / (double) maxRuns;
             averageBestrun4[j] = (double) totalBestrun4[j] / (double) maxRuns;
             averageAveragerun4[j] =  totalAveragerun4[j] / (double) maxRuns;
         }
 
-        XYLineChart_AWT chart1 = new XYLineChart_AWT("Test to compare deceptive and unimodal unconstrained environments",
-                "Deceptive vs Unimodal unconstrained", averageBestrun3, averageAveragerun3, averageBestrun4, averageAveragerun4, generationLength);
+        XYLineChart_AWT chart1 = new XYLineChart_AWT("Test to compare mutation functions",
+                "Repair vs Average mutation",averageBestrun1, averageAveragerun1, averageBestrun2, averageAveragerun2, averageBestrun3, averageAveragerun3, averageBestrun4, averageAveragerun4, generationLength);
         chart1.pack( );
         RefineryUtilities.centerFrameOnScreen( chart1 );
         chart1.setVisible( true );
 
-//        averageConvergencerun1 = totalConvergencerun1/convergentRuns1;
-//        averageConvergencerun2 = totalConvergencerun2/convergentRuns2;
+        averageConvergencerun1 = totalConvergencerun1/convergentRuns1;
+        averageConvergencerun2 = totalConvergencerun2/convergentRuns2;
         averageConvergencerun3 = totalConvergencerun3/convergentRuns3;
         averageConvergencerun4 = totalConvergencerun3/convergentRuns4;
 
 
-//        System.out.println("\n 1 Total Runs: " + maxRuns + " Convergence: " + convergentRuns1 + " Average: " + averageConvergencerun1);
-//        System.out.println("\n 2 Tasks Total Runs: " + maxRuns + " Convergence: " + convergentRuns2 + " Average: " + averageConvergencerun2);
+        System.out.println("\n Unimodal Repair Total Runs: " + maxRuns + " Convergence: " + convergentRuns1 + " Average: " + averageConvergencerun1);
+        System.out.println("\n Deceptive Total Runs: " + maxRuns + " Convergence: " + convergentRuns2 + " Average: " + averageConvergencerun2);
         System.out.println("\n Unimodal Total Runs: " + maxRuns + " Convergence: " + convergentRuns3 + " Average: " + averageConvergencerun3);
         System.out.println("\n Deceptive Total Runs: " + maxRuns + " Convergence: " + convergentRuns4 + " Average: " + averageConvergencerun4);
     }
@@ -187,22 +187,22 @@ public class mainGA {
 
 class XYLineChart_AWT extends ApplicationFrame {
 
-//    double[] bestDataset1;
-//    double[] averageDataset1;
-//    double[] bestDataset2;
-//    double[] averageDataset2;
+    double[] bestDataset1;
+    double[] averageDataset1;
+    double[] bestDataset2;
+    double[] averageDataset2;
     double[] bestDataset3;
     double[] averageDataset3;
     double[] bestDataset4;
     double[] averageDataset4;
     int generationLength;
 
-    public XYLineChart_AWT( String applicationTitle, String chartTitle, double[] bestFitness3, double[] averageFitness3, double[] bestFitness4, double[] averageFitness4, int generationLength) {
+    public XYLineChart_AWT( String applicationTitle, String chartTitle,double[] bestFitness1, double[] averageFitness1, double[] bestFitness2, double[] averageFitness2, double[] bestFitness3, double[] averageFitness3, double[] bestFitness4, double[] averageFitness4, int generationLength) {
         super(applicationTitle);
-//        this.bestDataset1 = bestFitness1;
-//        this.averageDataset1 = averageFitness1;
-//        this.bestDataset2 = bestFitness2;
-//        this.averageDataset2 = averageFitness2;
+        this.bestDataset1 = bestFitness1;
+        this.averageDataset1 = averageFitness1;
+        this.bestDataset2 = bestFitness2;
+        this.averageDataset2 = averageFitness2;
         this.bestDataset3 = bestFitness3;
         this.averageDataset3 = averageFitness3;
         this.bestDataset4 = bestFitness4;
@@ -225,10 +225,10 @@ class XYLineChart_AWT extends ApplicationFrame {
         renderer.setSeriesPaint( 1 , Color.BLUE);
         renderer.setSeriesPaint( 1 , Color.RED);
         renderer.setSeriesPaint( 1 , Color.ORANGE);
-//        renderer.setSeriesPaint( 1 , Color.MAGENTA);
-//        renderer.setSeriesPaint( 1 , Color.PINK);
-//        renderer.setSeriesPaint( 1 , Color.BLACK);
-//        renderer.setSeriesPaint( 1 , Color.CYAN);
+        renderer.setSeriesPaint( 1 , Color.MAGENTA);
+        renderer.setSeriesPaint( 1 , Color.PINK);
+        renderer.setSeriesPaint( 1 , Color.BLACK);
+        renderer.setSeriesPaint( 1 , Color.CYAN);
         renderer.setSeriesStroke( 1 , new BasicStroke());
         plot.setRenderer( renderer );
         setContentPane( chartPanel );
@@ -247,53 +247,53 @@ class XYLineChart_AWT extends ApplicationFrame {
     }
 
     private XYDataset createDataset( ) {
-//        final XYSeries best1 = new XYSeries( "Best 1" );
-//        for(int gen = 0; gen < generationLength; gen++){
-//            best1.add(gen, bestDataset1[gen]);
-//        }
-//
-//
-//        final XYSeries average1 = new XYSeries( "Average 1" );
-//        for(int gen = 0; gen < generationLength; gen++){
-//            average1.add(gen, averageDataset1[gen]);
-//        }
-//
-//        final XYSeries best2 = new XYSeries( "Best 2" );
-//        for(int gen = 0; gen < generationLength; gen++){
-//            best2.add(gen, bestDataset2[gen]);
-//        }
-//
-//
-//        final XYSeries average2 = new XYSeries( "Average 2" );
-//        for(int gen = 0; gen < generationLength; gen++){
-//            average2.add(gen, averageDataset2[gen]);
-//        }
+        final XYSeries best1 = new XYSeries( "Best Unimodal Repair" );
+        for(int gen = 0; gen < generationLength; gen++){
+            best1.add(gen, bestDataset1[gen]);
+        }
 
-        final XYSeries best3 = new XYSeries( "Best Unimodal" );
+
+        final XYSeries average1 = new XYSeries( "Average Unimodal Repair" );
+        for(int gen = 0; gen < generationLength; gen++){
+            average1.add(gen, averageDataset1[gen]);
+        }
+
+        final XYSeries best2 = new XYSeries( "Best Deceptive Repair" );
+        for(int gen = 0; gen < generationLength; gen++){
+            best2.add(gen, bestDataset2[gen]);
+        }
+
+
+        final XYSeries average2 = new XYSeries( "Average Deceptive Repair" );
+        for(int gen = 0; gen < generationLength; gen++){
+            average2.add(gen, averageDataset2[gen]);
+        }
+
+        final XYSeries best3 = new XYSeries( "Best Unimodal Averaged" );
         for(int gen = 0; gen < generationLength; gen++){
             best3.add(gen, bestDataset3[gen]);
         }
 
-        final XYSeries average3 = new XYSeries( "Average Unimodal" );
+        final XYSeries average3 = new XYSeries( "Average Unimodal Averaged" );
         for(int gen = 0; gen < generationLength; gen++){
             average3.add(gen, averageDataset3[gen]);
         }
 
-        final XYSeries best4 = new XYSeries( "Best Deceptive" );
+        final XYSeries best4 = new XYSeries( "Best Deceptive Averaged" );
         for(int gen = 0; gen < generationLength; gen++){
             best4.add(gen, bestDataset4[gen]);
         }
 
-        final XYSeries average4 = new XYSeries( "Average Deceptive" );
+        final XYSeries average4 = new XYSeries( "Average Deceptive Averaged" );
         for(int gen = 0; gen < generationLength; gen++){
             average4.add(gen, averageDataset4[gen]);
         }
 
         final XYSeriesCollection dataset = new XYSeriesCollection( );
-//        dataset.addSeries(best1);
-//        dataset.addSeries(average1);
-//        dataset.addSeries(best2);
-//        dataset.addSeries(average2);
+        dataset.addSeries(best1);
+        dataset.addSeries(average1);
+        dataset.addSeries(best2);
+        dataset.addSeries(average2);
         dataset.addSeries(best3);
         dataset.addSeries(average3);
         dataset.addSeries(best4);
