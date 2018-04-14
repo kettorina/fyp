@@ -157,10 +157,10 @@ public class GA implements Comparator<List<List<Integer>>> {
 
             List<List<Integer>> currentElite = elitism(elitismValue, tempFitness, population);
 
-            if(isConverging && !isEliteReplaced){
-                currentElite = eraseTopAfterElitism(elitismValue);
-                isEliteReplaced = true;
-            }
+//            if(isConverging && !isEliteReplaced){
+//                currentElite = eraseTopAfterElitism(elitismValue);
+//                isEliteReplaced = true;
+//            }
 
             List<List<Integer>> currentPopulation = tournamentSelection(population, currentFitnessFunction, tournamentSize);
 

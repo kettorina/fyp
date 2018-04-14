@@ -121,7 +121,7 @@ public class mainGA {
 
 
             int[] idealTaskRun3 = new int[] {100,100,100};
-            GA run3 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 0, false, false, 0, 50, false, generationLength);
+            GA run3 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 0, false, true, 0, 50, true, generationLength);
             int [] bestFitnessrun3 = run3.getBestFitness();
             double [] averageFitnessrun3 = run3.getAverageFitness();
 
@@ -137,7 +137,7 @@ public class mainGA {
             }
 
 
-            GA run4 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 200, true, false, 0, 50, false, generationLength);
+            GA run4 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 200, true, true, 0, 50, true, generationLength);
             int [] bestFitnessrun4 = run4.getBestFitness();
             double [] averageFitnessrun4 = run4.getAverageFitness();
 
