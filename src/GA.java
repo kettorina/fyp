@@ -108,15 +108,10 @@ public class GA implements Comparator<List<List<Integer>>> {
             currentFitnessFunction = new ArrayList<>();
 
             //evaluation of Fitness Function
-            if(isSizeConstrained){
-                if (isDeceptive) {
-                    currentFitnessFunction = deceptiveFitnessEvaluation(population);
-                } else currentFitnessFunction = unimodalFitnessEvaluation(population);
-            }
-            else{
-                if(isDeceptive){
-                    currentFitnessFunction = sizeRestrictedDeceptiveFitnessEvaluation(population);
-                }else currentFitnessFunction = sizeRestrictedUnimodalFitnessEvaluation(population);
+            if(isDeceptive){
+                currentFitnessFunction = sizeRestrictedDeceptiveFitnessEvaluation(population);
+            }else {
+                currentFitnessFunction = sizeRestrictedUnimodalFitnessEvaluation(population);
             }
 
 
@@ -220,7 +215,13 @@ public class GA implements Comparator<List<List<Integer>>> {
 
 //            System.out.println("Size of the population after crossover " population.size());
 
-            List<List<Integer>> mutatedPopulation = mutationConstrained(mutationRate, currentPopulation);
+            List<List<Integer>> mutatedPopulation = new ArrayList<>();
+
+            if(isSizeConstrained){
+                mutatedPopulation = mutationConstrained(mutationRate, currentPopulation);
+            }else {
+                mutatedPopulation = mutationUnconstrained(mutationRate, currentPopulation);
+            }
 
             for(List<Integer> curr : mutatedPopulation){
                 population.add(curr);
@@ -796,6 +797,28 @@ public class GA implements Comparator<List<List<Integer>>> {
         return mutatedPopulation;
     }
 
+    public static List<List<Integer>> mutationUnconstrained(int mutationRate, List<List<Integer>> currentPopulation){
+        List<List<Integer>> mutatedPopulation = new ArrayList<>();
+
+        for(int i = 0; i < mutationRate; i++){
+            List<Integer> toMutate = new ArrayList<>();
+            int mutatedChromosome = random.nextInt(currentPopulation.size());
+            int mutatedGene = random.nextInt(taskNumber);
+            int mutatedValue = random.nextInt(populationSize);
+
+            for(int j = 0; j <taskNumber; j++){
+                if(j == mutatedGene){
+                    toMutate.add(mutatedValue);
+                }else{
+                    toMutate.add(currentPopulation.get(mutatedChromosome).get(j));
+                }
+            }
+            mutatedPopulation.add(toMutate);
+        }
+
+        return  mutatedPopulation;
+    }
+
     public static List<List<Integer>> mutationConstrained(int mutationRate, List<List<Integer>> currentPopulation){
 
         List<List<Integer>> mutatedPopulation = new ArrayList<>();
@@ -807,7 +830,7 @@ public class GA implements Comparator<List<List<Integer>>> {
             int value = 0;
             int diff = 0;
             int mutatedGene = random.nextInt(taskNumber);
-            int mutatedChromosome = ThreadLocalRandom.current().nextInt(elitismValue, populationSize);
+            int mutatedChromosome = ThreadLocalRandom.current().nextInt(elitismValue, currentPopulation.size());
 //
 //            System.out.println("OG");
             for(int j = 0; j <taskNumber; j++){
@@ -860,9 +883,9 @@ public class GA implements Comparator<List<List<Integer>>> {
                 for( int c = 0; c < taskNumber; c++){
                     sizeCheck += toMutate.get(c);
                 }
-                if(sizeCheck != populationSize){
-                    System.out.println(sizeCheck + " doesn't go in the range");
-                }
+//                if(sizeCheck != populationSize){
+//                    System.out.println(sizeCheck + " doesn't go in the range");
+//                }
             }
 
             if(diff > 0){
@@ -901,9 +924,9 @@ public class GA implements Comparator<List<List<Integer>>> {
                 for( int c = 0; c < taskNumber; c++){
                     sizeCheck += toMutate.get(c);
                 }
-                if(sizeCheck != populationSize){
-                    System.out.println(sizeCheck + " doesn't go in the range");
-                }
+//                if(sizeCheck != populationSize){
+//                    System.out.println(sizeCheck + " doesn't go in the range");
+//                }
 
             }
 

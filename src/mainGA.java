@@ -86,9 +86,9 @@ public class mainGA {
             System.out.println("----------------------------------------");
             maxRuns=run;
 
-//
-//            int[] idealTaskRun1 = new int[] {75,75,75,75};
-//            GA run1 = new GA(300, 4, 3, idealTaskRun1, 1000, 20, 10, 0, false, false, 0, 50, true, generationLength);
+
+//            int[] idealTaskRun1 = new int[] {100,100,100};
+//            GA run1 = new GA(300, 3, 2, idealTaskRun1, 1000, 20, 10, 0, false, false, 0, 50, true, generationLength);
 //            int [] bestFitnessrun1 = run1.getBestFitness();
 //            double [] averageFitness1 = run1.getAverageFitness();
 //
@@ -104,7 +104,7 @@ public class mainGA {
 //            }
 //
 //            //int[] idealTaskRun2 = new int[] {75,75,75,75};
-//            GA run2 = new GA(300, 4, 3, idealTaskRun1, 1000, 20, 10, 200, true, false, 0, 50, true, generationLength);
+//            GA run2 = new GA(300, 3, 2, idealTaskRun1, 1000, 20, 10, 200, true, false, 0, 50, true, generationLength);
 //            int [] bestFitnessrun2 = run2.getBestFitness();
 //            double [] averageFitnessrun2 = run2.getAverageFitness();
 //
@@ -121,7 +121,7 @@ public class mainGA {
 
 
             int[] idealTaskRun3 = new int[] {100,100,100};
-            GA run3 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 0, false, false, 0, 50, true, generationLength);
+            GA run3 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 0, false, false, 0, 50, false, generationLength);
             int [] bestFitnessrun3 = run3.getBestFitness();
             double [] averageFitnessrun3 = run3.getAverageFitness();
 
@@ -137,7 +137,7 @@ public class mainGA {
             }
 
 
-            GA run4 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 200, true, false, 0, 50, true, generationLength);
+            GA run4 = new GA(300, 3, 2, idealTaskRun3, 1000, 20, 10, 200, true, false, 0, 50, false, generationLength);
             int [] bestFitnessrun4 = run4.getBestFitness();
             double [] averageFitnessrun4 = run4.getAverageFitness();
 
@@ -166,8 +166,8 @@ public class mainGA {
             averageAveragerun4[j] =  totalAveragerun4[j] / (double) maxRuns;
         }
 
-        XYLineChart_AWT chart1 = new XYLineChart_AWT("Test to compare deceptive and unimodal environment",
-                "Deceptive vs Unimodal", averageBestrun3, averageAveragerun3, averageBestrun4, averageAveragerun4, generationLength);
+        XYLineChart_AWT chart1 = new XYLineChart_AWT("Test to compare deceptive and unimodal unconstrained environments",
+                "Deceptive vs Unimodal unconstrained", averageBestrun3, averageAveragerun3, averageBestrun4, averageAveragerun4, generationLength);
         chart1.pack( );
         RefineryUtilities.centerFrameOnScreen( chart1 );
         chart1.setVisible( true );
