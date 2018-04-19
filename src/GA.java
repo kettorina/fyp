@@ -48,6 +48,9 @@ public class GA implements Comparator<List<List<Integer>>> {
     static boolean isConverging = false;
     static int convergenceGen;
 
+    static boolean isConverging2 = false;
+    static int convergenceGen2;
+
     static boolean isEliteReplaced = false;
 
     static int changeGenValue;
@@ -196,6 +199,24 @@ public class GA implements Comparator<List<List<Integer>>> {
                 }
             }
 
+            if(!isConverging2){
+                if(!isDeceptive){
+                    if(averageFitnessValue - 0 <= 0.000001){
+                        if(!isSizeConstrained){
+                            System.out.println("Unrestricted: " + averageFitnessValue + " gen: " + gen);
+                            isConverging2 = true;
+                            convergenceGen2 = gen;
+                        }
+                        else{
+                            System.out.println("Restricted: " + averageFitnessValue + " gen: " + gen);
+                            isConverging2 = true;
+                            convergenceGen2 = gen;
+                        }
+
+                    }
+                }
+            }
+
 
             for(List<Integer> curr : currentElite){
                 population.add(curr);
@@ -208,7 +229,7 @@ public class GA implements Comparator<List<List<Integer>>> {
 //            System.out.println(crossoverNumber);
 
             if(isSizeConstrained){
-                if(!choice){
+                if(choice){
                     crossoverPopulation = repairConstraintCrossover(crossoverNumber, currentPopulation);
                 }else{
                     crossoverPopulation = averageConstraintCrossover(crossoverNumber, currentPopulation);
@@ -226,7 +247,7 @@ public class GA implements Comparator<List<List<Integer>>> {
             List<List<Integer>> mutatedPopulation = new ArrayList<>();
 
             if(isSizeConstrained){
-                mutatedPopulation = mutationConstrained(mutationRate, currentPopulation);
+                mutatedPopulation = mutation(mutationRate, currentPopulation);
             }else {
                 mutatedPopulation = mutationUnconstrained(mutationRate, currentPopulation);
             }
@@ -313,49 +334,6 @@ public class GA implements Comparator<List<List<Integer>>> {
             fitnessFunction.add(tempFitnessFunction);
         }
         return fitnessFunction;
-    }
-
-    public static List<Integer> simulatedFitnessEvaluation(List<List<Integer>> population){
-        List<Integer> fitnessFunction = new ArrayList<>();
-
-        for(int sim = 0; sim < population.size(); sim++){
-            for(int steps = 0; steps < 1000; steps++){
-                //forage
-                forage(population, sim);
-                //defend nest
-                defendNest(population, sim);
-                //reproduce
-                reproduce(population, sim);
-                //alter if some condition is met
-                alter(population);
-            }
-        }
-
-        return fitnessFunction;
-    }
-
-    public static void forage(List<List<Integer>> population, int sim){
-        List<Integer> fitnessFunction = new ArrayList<>();
-        int numAllocated = population.get(sim).get(0);
-
-
-    }
-
-    public static void defendNest(List<List<Integer>> population, int sim){
-        List<Integer> fitnessFunction = new ArrayList<>();
-        int numAllocated = population.get(sim).get(0);
-
-    }
-
-    public static void reproduce(List<List<Integer>> population, int sim){
-        List<Integer> fitnessFunction = new ArrayList<>();
-        int numAllocated = population.get(sim).get(0);
-
-    }
-
-    public static void alter(List<List<Integer>> population){
-        List<Integer> fitnessFunction = new ArrayList<>();
-
     }
 
     public static List<Integer> sizeRestrictedDeceptiveFitnessEvaluation(List<List<Integer>> population){
@@ -1023,6 +1001,18 @@ public class GA implements Comparator<List<List<Integer>>> {
 
     public void setIsConverging(boolean bool){
         this.isConverging = bool;
+    }
+
+    public boolean getIsConverging2(){
+        return isConverging2;
+    }
+
+    public int getConvergenceValue2(){
+        return convergenceGen2;
+    }
+
+    public void setIsConverging2(boolean bool){
+        this.isConverging2 = bool;
     }
 
 }
